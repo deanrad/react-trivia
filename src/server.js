@@ -9,7 +9,10 @@ export function startServer(store) {
 
   io.on('connection', (socket) => {
     socket.emit('state', store.getState().toJS());
-    socket.on('action', store.dispatch.bind(store));
+    socket.on('action', (e) => {
+        console.log('event received: ', e)
+        store.dispatch(e)
+    });
   });
 
 }
