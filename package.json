@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "deps": "madge index.js src/ -f es6 -i deps.png; open deps.png",
     "start": "babel-node index.js",
     "test": "mocha --compilers js:babel-core/register  --require ./test/test_helper.js  --recursive",
     "test:watch": "npm run test -- --watch"

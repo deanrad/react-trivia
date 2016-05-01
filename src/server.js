@@ -12,6 +12,7 @@ export function startServer(store) {
     socket.on('action', (e) => {
         console.log('event received: ', e)
         store.dispatch(e)
+        console.log(store.getState().toJS())
     });
   });
 
