@@ -1,85 +1,17 @@
-import {Map, fromJS} from 'immutable';
-import {expect} from 'chai';
+import {expect} from 'chai'
+import {AddPlayer} from '../src/actions'
 
-import reducer from '../src/reducer';
+import reducer from '../src/reducers/player'
 
-describe('reducer', () => {
+describe('The Reducer', () => {
 
-  it('handles SET_ENTRIES', () => {
-    const initialState = Map();
-    const action = {type: 'SET_ENTRIES', entries: ['Trainspotting']};
-    const nextState = reducer(initialState, action);
+  it('initial state is that of an unstarted game awaiting players', () => {
+    const nextState = reducer(undefined, {})
+    expect(nextState).to.equal(examples.gameStates.initial)
+  })
 
-    expect(nextState).to.equal(fromJS({
-      entries: ['Trainspotting'],
-      initialEntries: ['Trainspotting']
-    }));
-  });
-
-  it('handles NEXT', () => {
-    const initialState = fromJS({
-      entries: ['Trainspotting', '28 Days Later']
-    });
-    const action = {type: 'NEXT'};
-    const nextState = reducer(initialState, action);
-
-    expect(nextState).to.equal(fromJS({
-      vote: {
-        round: 1,
-        pair: ['Trainspotting', '28 Days Later']
-      },
-      entries: []
-    }));
-  });
-
-  it('handles VOTE', () => {
-    const initialState = fromJS({
-      vote: {
-        round: 1,
-        pair: ['Trainspotting', '28 Days Later']
-      },
-      entries: []
-    });
-    const action = {type: 'VOTE', entry: 'Trainspotting', clientId: 'voter1'};
-    const nextState = reducer(initialState, action);
-
-    expect(nextState).to.equal(fromJS({
-      vote: {
-        round: 1,
-        pair: ['Trainspotting', '28 Days Later'],
-        tally: {Trainspotting: 1},
-        votes: {
-          voter1: 'Trainspotting'
-        }
-      },
-      entries: []
-    }));
-  });
-
-  it('has an initial state', () => {
-    const action = {type: 'SET_ENTRIES', entries: ['Trainspotting']};
-    const nextState = reducer(undefined, action);
-    expect(nextState).to.equal(fromJS({
-      entries: ['Trainspotting'],
-      initialEntries: ['Trainspotting']
-    }));
-  });
-
-  it('can be used with reduce', () => {
-    const actions = [
-      {type: 'SET_ENTRIES', entries: ['Trainspotting', '28 Days Later']},
-      {type: 'NEXT'},
-      {type: 'VOTE', entry: 'Trainspotting', clientId: 'voter1'},
-      {type: 'VOTE', entry: '28 Days Later', clientId: 'voter2'},
-      {type: 'VOTE', entry: 'Trainspotting', clientId: 'voter3'},
-      {type: 'NEXT'}
-    ];
-    const finalState = actions.reduce(reducer, Map());
-
-    expect(finalState).to.equal(fromJS({
-      winner: 'Trainspotting',
-      initialEntries: ['Trainspotting', '28 Days Later']
-    }));
-  });
-
-});
+  it('can take an ADD_PLAYER action', () => {
+    const nextState = reducer(examples.gameStates.initial, AddPlayer({p: 1}))
+    expect(nextState).to.deep.equal({})
+  })
+})
