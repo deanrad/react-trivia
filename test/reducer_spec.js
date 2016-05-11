@@ -11,7 +11,7 @@ describe('The Reducer', () => {
     expect(nextState).to.equal(fromJS(examples.gameStates.initial))
   })
 
-  it('can take an ADD_PLAYER action', () => {
+  it('adds a player to a game from an ADD_PLAYER action', () => {
     const actions = [
       undefined,
       {

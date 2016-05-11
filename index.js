@@ -1,4 +1,4 @@
-import makeStore from './src/store';
+import makeStore from './src/makeStore';
 import {startServer} from './src/server';
 
 export const store = makeStore();

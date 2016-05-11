@@ -1,8 +1,12 @@
+import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
-import playerReducer from './reducers/player'
+import {playerReducer} from './players/index'
 import responseReducer from './reducers/response'
 
-export default playerReducer
+export default combineReducers({
+  players: playerReducer,
+  responses: responseReducer
+})
 
 // handleActions({
 //   players: playerReducer,
