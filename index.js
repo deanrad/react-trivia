@@ -1,11 +1,8 @@
-import makeStore from './src/makeStore';
-import {startServer} from './src/server';
+import makeStore from './src/makeStore'
+import setupPubSub from './src/pubsub'
 
-export const store = makeStore();
-startServer(store);
+const store = makeStore()
 
-store.dispatch({
-  type: 'SET_ENTRIES',
-  entries: require('./entries.json')
-});
-store.dispatch({type: 'NEXT'});
+console.log(store.getState())
+
+setupPubSub(store)

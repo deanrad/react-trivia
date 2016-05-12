@@ -1,14 +1,12 @@
 import {combineReducers} from 'redux'
-import {handleActions} from 'redux-actions'
 import {playerReducer} from './players/index'
-import responseReducer from './reducers/response'
+
+const defaultQuestion = {
+  prompt: 'WTF?',
+  choices: ['dunno', '42', 'QED', 'fckall']
+}
 
 export default combineReducers({
+  question: (state) => state || defaultQuestion,
   players: playerReducer,
-  responses: responseReducer
 })
-
-// handleActions({
-//   players: playerReducer,
-//   response: responseReducer
-// })

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "config": {
+    "port": 800
+  },
   "scripts": {
     "deps": "madge index.js src/ -f es6 -i deps.png; open deps.png",
     "start": "babel-node index.js",
@@ -21,7 +24,6 @@
   },
   "dependencies": {
     "babel-cli": "^6.5.1",
-    "immutable": "3.7.6",
     "redux": "3.3.1",
     "redux-act": "^0.4.1",
     "socket.io": "1.4.5"
