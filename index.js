@@ -6,8 +6,9 @@ import Actions from './src/actions'
 const store = makeStore()
 console.log(store.getState())
 
-console.log('Running on port 8470')
-const io = new Server().attach(8470)
+let port = process.env.PORT || 8470
+console.log(`Running on port ${port}`)
+const io = new Server().attach(port)
 
 setupPubSub(store, io)
 
