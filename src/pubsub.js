@@ -1,18 +1,17 @@
-import Server from 'socket.io'
-
-console.log('Running on port 8470')
-const io = new Server().attach(8470)
-
-export default (store) => {
+export default (store, io) => {
   // emit state updates whenever the store changes
   store.subscribe(() => {
+    // TODO make a middleware to broadcast actions instead
     var state = store.getState()
     io.emit('state', state)
-    console.log(state)
+    console.log('broadcast', state)
   })
+
+  // use a middleware to replay actions to all but the client who sent it
 
   io.on('connection', (socket) => {
     // give the state to newly connected clients
+    console.log('new connection')
     socket.emit('state', store.getState())
 
     // accept actions from clients
