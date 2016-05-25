@@ -3,23 +3,28 @@ import ReactDOM from 'react-dom'
 import {Router, Route, hashHistory} from 'react-router'
 import {Provider} from 'react-redux'
 import store from './store'
+import Actions from './actions'
+import {setupPubSub} from './pubsub'
+
+const wsUrl = 'http://react-trivia.herokuapp.com'
+//const wsUrl = location.protocol + '//' + `${location.hostname}:8470`
+const socket = setupPubSub(wsUrl)
+
+window.socket = socket
+window.Store = store
+window.Actions = Actions
+
 
 const TestHarness = (props) => (
-  <div>
-    <h2>Action Triggers</h2>
-  </div>
+  <h2>Action Triggers</h2>
 )
 
 const Main = (props) => (
-  <div>
-    <h2>Main</h2>
-  </div>
+  <h2>Main</h2>
 )
 
 const Admin = (props) => (
-  <div>
-    <h2>Admin</h2>
-  </div>
+  <h2>Admin</h2>
 )
 
 const routes = <Route>
