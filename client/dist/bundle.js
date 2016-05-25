@@ -7527,8 +7527,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	//const wsUrl = 'http://react-trivia.herokuapp.com'
-	var wsUrl = location.protocol + '//' + (location.hostname + ':8470');
+	var wsUrl = 'http://react-trivia.herokuapp.com';
+	//const wsUrl = location.protocol + '//' + `${location.hostname}:8470`
 	var socket = (0, _pubsub.setupPubSub)(wsUrl);
 
 	window.socket = socket;
