@@ -1,0 +1,42 @@
+[
+    {
+      "prompt": "Mountain Dew was originally slang for:",
+      "choices": [
+        "Coffee",
+        "Red Bull",
+        "Whiskey",
+        "Moonshine"
+      ],
+      "answer": "Moonshine"
+    },
+    {
+      "prompt": "The Dependency Inversion Principle applies to Redux because:",
+      "choices": [
+        "Redux depends on React",
+        "The Store and Reducers know about Actions",
+        "React depends on Redux",
+        "Huh?"
+      ],
+      "answer": "The Store and Reducers know about Actions"
+    },
+    {
+      "prompt": "JavaScript's creator spent this long creating it:",
+      "choices": [
+        "10 hours",
+        "10 days",
+        "10 weeks",
+        "10 months"
+      ],
+      "answer": "10 days"
+    },
+    {
+      "prompt": "Known as the Father of the Internet, he developed hypertext, which we now call HTML",
+      "choices": [
+        "Steve Jobs",
+        "Douglas Crockford",
+        "Tim Berners Lee",
+        "Bill Gates"
+      ],
+      "answer": "Tim Berners Lee"
+    }
+]
