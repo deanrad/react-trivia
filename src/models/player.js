@@ -1,11 +1,11 @@
 import {createAction, createReducer} from 'redux-act'
 
-let addPlayer = createAction('JOIN_PLAYER')
+let joinPlayer = createAction('JOIN_PLAYER')
 
 export let Actions = {
-  addPlayer
+  joinPlayer
 }
 
 export let Reducer = createReducer({
-  [addPlayer]: (players, p) => [...players, p]
+  [joinPlayer]: (players, p) => [...players, p]
 }, []);

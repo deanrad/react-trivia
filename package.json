@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "config": {
-    "port": 800
-  },
   "scripts": {
     "deps": "madge index.js src/ -f es6 -i deps.png; open deps.png",
     "start": "babel-node index.js",
+    "client": "webpack-dev-server --host 0.0.0.0 --port 3120",
     "test": "echo 'Test soon'",
     "test:watch": "npm run test -- --watch"
   },
@@ -17,22 +15,34 @@
   "devDependencies": {
     "babel-cli": "6.5.1",
     "babel-core": "6.5.1",
+    "babel-preset-react": "^6.5.0",
     "chai": "3.5.0",
     "mocha": "2.4.5",
     "sinon": "^1.17.4",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
     "babel-cli": "^6.5.1",
-    "babel-preset-es2015": "6.5.0",
+    "babel-core": "^6.5.1",
+    "babel-loader": "^6.2.4",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.5.0",
+    "babel-preset-react": "^6.5.0",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.4.1",
+    "react-trivia-shared": "file:../shared",
     "redux": "3.3.1",
     "redux-act": "^0.4.1",
     "socket.io": "1.4.5"
   },
   "babel": {
     "presets": [
-      "es2015"
+      "es2015",
+      "react"
     ],
     "plugins": [
       "transform-object-rest-spread"

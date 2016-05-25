@@ -15,7 +15,7 @@ setupPubSub(store, io)
 // testing- play some actions
 
 let initActions = [
-  Actions.addPlayer({name: 'Khaaaann!', clientId: '666'}),
+  Actions.joinPlayer({name: 'Khaaaann!', clientId: '666'}),
   Actions.beginGame(),
   Actions.advanceQuestion()
 ]
