@@ -6,8 +6,8 @@ import {setupPubSub} from './pubsub'
 
 console.debug('loaded store')
 
-//const wsUrl = 'http://react-trivia.herokuapp.com'
-const wsUrl = location.protocol + '//' + `${location.hostname}:8470`
+const wsUrl = 'http://react-trivia.herokuapp.com'
+//const wsUrl = location.protocol + '//' + `${location.hostname}:8470`
 
 const {socket, middleware} = setupPubSub(wsUrl)
 
