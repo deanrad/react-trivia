@@ -14,11 +14,29 @@ const TestHarness = (props) => (
   <h2>Action Triggers</h2>
 )
 
-const Main = ({game, round}) => (
+const Round = ({question, responses}) => {
+  let {prompt, choices=[]} = question || {}
+
+  return (<div className="voting">
+      <div>
+        Question: {prompt}
+      </div>
+      <div>
+      {choices.map(entry =>
+        <button key={entry}>
+          <h1>{entry}</h1>
+        </button>
+      )}
+      </div>
+    </div>)
+}
+
+const Main = ({game={}, round={}}) => (
   <div>
     <h3>
-        Game: {game && game.title}
-        <i>({game && game.status})</i>
+        Game: {game.title}
+        <i>({game.status})</i>
+        <Round {...round}/>
     </h3>
   </div>
 )

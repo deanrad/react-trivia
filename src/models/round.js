@@ -1,5 +1,5 @@
 import {createAction, createReducer} from 'redux-act'
-import Question from './Question'
+import Question from './question'
 
 export let advanceQuestion = createAction('ADVANCE_QUESTION')
 

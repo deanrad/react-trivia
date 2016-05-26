@@ -1,8 +1,14 @@
 export default class Question {
   static nextQuestion(current) {
-    return {
-      prompt: 'Wha?',
-      choices: ['uh huh', 'no way']
+    return     {
+      "prompt": "Mountain Dew was originally slang for:",
+      "choices": [
+        "Coffee",
+        "Red Bull",
+        "Whiskey",
+        "Moonshine"
+      ],
+      "answer": "Moonshine"
     }
   }
 }
