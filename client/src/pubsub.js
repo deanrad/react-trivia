@@ -9,13 +9,16 @@ export let setupPubSub = (wsUrl) => {
   // middleware to send actions not marked clientOnly to the server
   let middleware = store => next => (action) => {
     let sendToServer = !(action.meta && action.meta.clientOnly)
+
+    // some actions need not be applied locally vs let the server handle them
+    let applyLocal = !(action.meta && action.meta.skipClient)
     console.log('in custom middleware, sending to server: ', sendToServer)
     if (sendToServer) {
       let {myID} = store.getState()
       let meta = {clientId: myID}
       socket.emit('action', {...action, meta})
     }
-    return next(action)
+    return applyLocal && next(action)
   }
 
   // let middleware = store => next => action => {

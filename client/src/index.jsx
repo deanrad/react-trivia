@@ -11,7 +11,11 @@ window.Store = store
 window.Actions = Actions
 
 const TestHarness = (props) => (
-  <h2>Action Triggers</h2>
+  <div>
+    <h2>Action Triggers</h2>
+    <hr/>
+    <button onClick={() => Actions.advanceQuestion()}>Advance Question</button>
+  </div>
 )
 
 const Round = ({question, responses}) => {
@@ -33,6 +37,7 @@ const Round = ({question, responses}) => {
 
 const Main = ({game={}, round={}}) => (
   <div>
+    <a href="#test">Test Harness</a>
     <h3>
         Game: {game.title}
         <i>({game.status})</i>
