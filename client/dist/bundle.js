@@ -35740,11 +35740,9 @@
 
 	      var prompt = _ref.prompt;
 
-	      console.log('DRDR' + prompt);
 	      var idx = _reactTriviaQuestions2.default.findIndex(function (q) {
 	        return q.prompt == prompt;
 	      });
-	      console.log('DRDR2' + idx);
 	      var nextIdx = idx + 1;
 	      return _reactTriviaQuestions2.default[nextIdx];
 	    }
