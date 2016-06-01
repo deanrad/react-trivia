@@ -7517,20 +7517,23 @@
 
 	var _reduxAct = __webpack_require__(320);
 
-	var _store = __webpack_require__(330);
+	var _makeStore = __webpack_require__(330);
 
-	var _store2 = _interopRequireDefault(_store);
+	var _makeStore2 = _interopRequireDefault(_makeStore);
 
-	var _actions = __webpack_require__(340);
+	var _actions = __webpack_require__(383);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
+	var _pubsub = __webpack_require__(337);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	window.Store = _store2.default;
+	window.Store = _makeStore2.default;
 	window.Actions = _actions2.default;
 
-	(0, _reduxAct.assignAll)(_actions2.default, _store2.default);
+	(0, _reduxAct.assignAll)(_actions2.default, _makeStore2.default);
+	_pubsub.setState.assignTo(_makeStore2.default);
 
 	var TestHarness = function TestHarness(props) {
 	  return _react2.default.createElement(
@@ -7648,7 +7651,7 @@
 
 	_reactDom2.default.render(_react2.default.createElement(
 	  _reactRedux.Provider,
-	  { store: _store2.default },
+	  { store: _makeStore2.default },
 	  _react2.default.createElement(
 	    _reactRouter.Router,
 	    { history: _reactRouter.hashHistory },
@@ -35258,11 +35261,7 @@
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
-	var _actions = __webpack_require__(340);
-
-	var _actions2 = _interopRequireDefault(_actions);
-
-	var _pubsub = __webpack_require__(341);
+	var _pubsub = __webpack_require__(337);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35288,8 +35287,6 @@
 	//     createStoreWithMiddleware
 
 	var store = storeCreator(_reducer2.default);
-	// event to dispatch when the server has an update for us
-	socket.on('state', _actions2.default.setState);
 
 	exports.default = store;
 
@@ -35303,301 +35300,34 @@
 	  value: true
 	});
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	var _redux = __webpack_require__(309);
 
-	var _myID = __webpack_require__(332);
-
-	var _myID2 = _interopRequireDefault(_myID);
-
-	var _game = __webpack_require__(335);
+	var _game = __webpack_require__(332);
 
 	var Game = _interopRequireWildcard(_game);
 
-	var _player = __webpack_require__(336);
+	var _player = __webpack_require__(333);
 
 	var Player = _interopRequireWildcard(_player);
 
-	var _round = __webpack_require__(337);
+	var _round = __webpack_require__(334);
 
 	var Round = _interopRequireWildcard(_round);
 
+	var _pubsub = __webpack_require__(337);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var stateReducers = (0, _redux.combineReducers)({
-	  myID: _myID2.default.reducer,
+	var stateReducer = (0, _redux.combineReducers)({
 	  game: Game.Reducer,
 	  players: Player.Reducer,
 	  round: Round.Reducer
 	});
 
-	exports.default = function (state, action) {
-	  if (action.type === 'SET_STATE') {
-	    console.debug('Updating local state to', state);
-	    return _extends({}, state, action.payload);
-	  } else return stateReducers(state, action);
-	};
+	exports.default = (0, _pubsub.createServerUpdatingReducer)(stateReducer);
 
 /***/ },
 /* 332 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = getClientId;
-
-	var _uuid = __webpack_require__(333);
-
-	var _uuid2 = _interopRequireDefault(_uuid);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var localStorageKey = 'ReactTrivia-clientId';
-
-	function getClientId() {
-	  var id = localStorage.getItem(localStorageKey);
-	  if (!id) {
-	    id = _uuid2.default.v4();
-	    localStorage.setItem(localStorageKey, id);
-	  }
-	  return id;
-	}
-
-/***/ },
-/* 333 */
-/***/ function(module, exports, __webpack_require__) {
-
-	//     uuid.js
-	//
-	//     Copyright (c) 2010-2012 Robert Kieffer
-	//     MIT License - http://opensource.org/licenses/mit-license.php
-
-	// Unique ID creation requires a high quality random # generator.  We feature
-	// detect to determine the best RNG source, normalizing to a function that
-	// returns 128-bits of randomness, since that's what's usually required
-	var _rng = __webpack_require__(334);
-
-	// Maps for number <-> hex string conversion
-	var _byteToHex = [];
-	var _hexToByte = {};
-	for (var i = 0; i < 256; i++) {
-	  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
-	  _hexToByte[_byteToHex[i]] = i;
-	}
-
-	// **`parse()` - Parse a UUID into it's component bytes**
-	function parse(s, buf, offset) {
-	  var i = (buf && offset) || 0, ii = 0;
-
-	  buf = buf || [];
-	  s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
-	    if (ii < 16) { // Don't overflow!
-	      buf[i + ii++] = _hexToByte[oct];
-	    }
-	  });
-
-	  // Zero out remaining bytes if string was short
-	  while (ii < 16) {
-	    buf[i + ii++] = 0;
-	  }
-
-	  return buf;
-	}
-
-	// **`unparse()` - Convert UUID byte array (ala parse()) into a string**
-	function unparse(buf, offset) {
-	  var i = offset || 0, bth = _byteToHex;
-	  return  bth[buf[i++]] + bth[buf[i++]] +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] +
-	          bth[buf[i++]] + bth[buf[i++]] +
-	          bth[buf[i++]] + bth[buf[i++]];
-	}
-
-	// **`v1()` - Generate time-based UUID**
-	//
-	// Inspired by https://github.com/LiosK/UUID.js
-	// and http://docs.python.org/library/uuid.html
-
-	// random #'s we need to init node and clockseq
-	var _seedBytes = _rng();
-
-	// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-	var _nodeId = [
-	  _seedBytes[0] | 0x01,
-	  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
-	];
-
-	// Per 4.2.2, randomize (14 bit) clockseq
-	var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
-
-	// Previous uuid creation time
-	var _lastMSecs = 0, _lastNSecs = 0;
-
-	// See https://github.com/broofa/node-uuid for API details
-	function v1(options, buf, offset) {
-	  var i = buf && offset || 0;
-	  var b = buf || [];
-
-	  options = options || {};
-
-	  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
-
-	  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-	  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-	  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-	  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-	  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
-
-	  // Per 4.2.1.2, use count of uuid's generated during the current clock
-	  // cycle to simulate higher resolution clock
-	  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
-
-	  // Time since last uuid creation (in msecs)
-	  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
-
-	  // Per 4.2.1.2, Bump clockseq on clock regression
-	  if (dt < 0 && options.clockseq === undefined) {
-	    clockseq = clockseq + 1 & 0x3fff;
-	  }
-
-	  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-	  // time interval
-	  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-	    nsecs = 0;
-	  }
-
-	  // Per 4.2.1.2 Throw error if too many uuids are requested
-	  if (nsecs >= 10000) {
-	    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
-	  }
-
-	  _lastMSecs = msecs;
-	  _lastNSecs = nsecs;
-	  _clockseq = clockseq;
-
-	  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-	  msecs += 12219292800000;
-
-	  // `time_low`
-	  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-	  b[i++] = tl >>> 24 & 0xff;
-	  b[i++] = tl >>> 16 & 0xff;
-	  b[i++] = tl >>> 8 & 0xff;
-	  b[i++] = tl & 0xff;
-
-	  // `time_mid`
-	  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
-	  b[i++] = tmh >>> 8 & 0xff;
-	  b[i++] = tmh & 0xff;
-
-	  // `time_high_and_version`
-	  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-	  b[i++] = tmh >>> 16 & 0xff;
-
-	  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-	  b[i++] = clockseq >>> 8 | 0x80;
-
-	  // `clock_seq_low`
-	  b[i++] = clockseq & 0xff;
-
-	  // `node`
-	  var node = options.node || _nodeId;
-	  for (var n = 0; n < 6; n++) {
-	    b[i + n] = node[n];
-	  }
-
-	  return buf ? buf : unparse(b);
-	}
-
-	// **`v4()` - Generate random UUID**
-
-	// See https://github.com/broofa/node-uuid for API details
-	function v4(options, buf, offset) {
-	  // Deprecated - 'format' argument, as supported in v1.2
-	  var i = buf && offset || 0;
-
-	  if (typeof(options) == 'string') {
-	    buf = options == 'binary' ? new Array(16) : null;
-	    options = null;
-	  }
-	  options = options || {};
-
-	  var rnds = options.random || (options.rng || _rng)();
-
-	  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-	  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-	  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-	  // Copy bytes to buffer, if provided
-	  if (buf) {
-	    for (var ii = 0; ii < 16; ii++) {
-	      buf[i + ii] = rnds[ii];
-	    }
-	  }
-
-	  return buf || unparse(rnds);
-	}
-
-	// Export public API
-	var uuid = v4;
-	uuid.v1 = v1;
-	uuid.v4 = v4;
-	uuid.parse = parse;
-	uuid.unparse = unparse;
-
-	module.exports = uuid;
-
-
-/***/ },
-/* 334 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {
-	var rng;
-
-	if (global.crypto && crypto.getRandomValues) {
-	  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
-	  // Moderately fast, high quality
-	  var _rnds8 = new Uint8Array(16);
-	  rng = function whatwgRNG() {
-	    crypto.getRandomValues(_rnds8);
-	    return _rnds8;
-	  };
-	}
-
-	if (!rng) {
-	  // Math.random()-based (RNG)
-	  //
-	  // If all else fails, use Math.random().  It's fast, but is of unspecified
-	  // quality.
-	  var  _rnds = new Array(16);
-	  rng = function() {
-	    for (var i = 0, r; i < 16; i++) {
-	      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-	      _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-	    }
-
-	    return _rnds;
-	  };
-	}
-
-	module.exports = rng;
-
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35635,7 +35365,7 @@
 	}), _createReducer), initialGame);
 
 /***/ },
-/* 336 */
+/* 333 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35662,7 +35392,7 @@
 	}), []);
 
 /***/ },
-/* 337 */
+/* 334 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35678,7 +35408,7 @@
 
 	var _reduxAct = __webpack_require__(320);
 
-	var _question = __webpack_require__(338);
+	var _question = __webpack_require__(335);
 
 	var _question2 = _interopRequireDefault(_question);
 
@@ -35715,7 +35445,7 @@
 	}), _createReducer), initialRound);
 
 /***/ },
-/* 338 */
+/* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35727,7 +35457,7 @@
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // TODO keep questions and answers from going to the client
 
 
-	var _reactTriviaQuestions = __webpack_require__(339);
+	var _reactTriviaQuestions = __webpack_require__(336);
 
 	var _reactTriviaQuestions2 = _interopRequireDefault(_reactTriviaQuestions);
 
@@ -35761,7 +35491,7 @@
 	exports.default = Question;
 
 /***/ },
-/* 339 */
+/* 336 */
 /***/ function(module, exports) {
 
 	[
@@ -35813,7 +35543,7 @@
 
 
 /***/ },
-/* 340 */
+/* 337 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35821,53 +35551,17 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.setupPubSub = exports.createServerUpdatingReducer = exports.setState = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var _reduxAct = __webpack_require__(320);
 
-	var _game = __webpack_require__(335);
-
-	var Game = _interopRequireWildcard(_game);
-
-	var _player = __webpack_require__(336);
-
-	var Player = _interopRequireWildcard(_player);
-
-	var _round = __webpack_require__(337);
-
-	var Round = _interopRequireWildcard(_round);
-
-	var _pubsub = __webpack_require__(341);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	var actions = _extends({
-	  setState: _pubsub.setState
-	}, Game.Actions, Player.Actions, Round.Actions);
-
-	exports.default = actions;
-
-/***/ },
-/* 341 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.setupPubSub = exports.setState = undefined;
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _reduxAct = __webpack_require__(320);
-
-	var _socket = __webpack_require__(342);
+	var _socket = __webpack_require__(338);
 
 	var _socket2 = _interopRequireDefault(_socket);
 
-	var _myID = __webpack_require__(332);
+	var _myID = __webpack_require__(380);
 
 	var _myID2 = _interopRequireDefault(_myID);
 
@@ -35879,9 +35573,24 @@
 	  return { clientOnly: true };
 	});
 
+	// Takes a reducer, and returns an enhanced one that pre-empts origReducer
+	//  in order to handle server updates
+	var createServerUpdatingReducer = exports.createServerUpdatingReducer = function createServerUpdatingReducer(origReducer) {
+	  return function (state, action) {
+	    // note == below is intentional, to force toString to be called on the actionCreator
+	    if (action.type == setState) {
+	      console.debug('Updating local state to', state);
+	      return _extends({}, state, action.payload);
+	    }
+
+	    return origReducer(state, action);
+	  };
+	};
+
 	var setupPubSub = exports.setupPubSub = function setupPubSub(wsUrl) {
 	  console.log('Making WebSockets connection to ' + wsUrl);
 	  var socket = (0, _socket2.default)(wsUrl);
+	  socket.on('state', setState);
 
 	  // middleware to send actions not marked clientOnly to the server
 	  var middleware = function middleware(store) {
@@ -35904,18 +35613,11 @@
 	    };
 	  };
 
-	  // let middleware = store => next => action => {
-	  //   console.log('dispatching', action)
-	  //   let result = next(action)
-	  //   console.log('next state', store.getState())
-	  //   return result
-	  // }
-
 	  return { socket: socket, middleware: middleware };
 	};
 
 /***/ },
-/* 342 */
+/* 338 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -35923,9 +35625,9 @@
 	 * Module dependencies.
 	 */
 
-	var url = __webpack_require__(343);
-	var parser = __webpack_require__(345);
-	var Manager = __webpack_require__(351);
+	var url = __webpack_require__(339);
+	var parser = __webpack_require__(341);
+	var Manager = __webpack_require__(347);
 	var debug = __webpack_require__(20)('socket.io-client');
 
 	/**
@@ -36008,12 +35710,12 @@
 	 * @api public
 	 */
 
-	exports.Manager = __webpack_require__(351);
-	exports.Socket = __webpack_require__(377);
+	exports.Manager = __webpack_require__(347);
+	exports.Socket = __webpack_require__(373);
 
 
 /***/ },
-/* 343 */
+/* 339 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -36021,7 +35723,7 @@
 	 * Module dependencies.
 	 */
 
-	var parseuri = __webpack_require__(344);
+	var parseuri = __webpack_require__(340);
 	var debug = __webpack_require__(20)('socket.io-client:url');
 
 	/**
@@ -36096,7 +35798,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 344 */
+/* 340 */
 /***/ function(module, exports) {
 
 	/**
@@ -36141,7 +35843,7 @@
 
 
 /***/ },
-/* 345 */
+/* 341 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -36150,11 +35852,11 @@
 	 */
 
 	var debug = __webpack_require__(20)('socket.io-parser');
-	var json = __webpack_require__(346);
-	var isArray = __webpack_require__(347);
-	var Emitter = __webpack_require__(348);
-	var binary = __webpack_require__(349);
-	var isBuf = __webpack_require__(350);
+	var json = __webpack_require__(342);
+	var isArray = __webpack_require__(343);
+	var Emitter = __webpack_require__(344);
+	var binary = __webpack_require__(345);
+	var isBuf = __webpack_require__(346);
 
 	/**
 	 * Protocol version.
@@ -36547,7 +36249,7 @@
 
 
 /***/ },
-/* 346 */
+/* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! JSON v3.3.2 | http://bestiejs.github.io/json3 | Copyright 2012-2014, Kit Cambridge | http://kit.mit-license.org */
@@ -37456,7 +37158,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module), (function() { return this; }())))
 
 /***/ },
-/* 347 */
+/* 343 */
 /***/ function(module, exports) {
 
 	module.exports = Array.isArray || function (arr) {
@@ -37465,7 +37167,7 @@
 
 
 /***/ },
-/* 348 */
+/* 344 */
 /***/ function(module, exports) {
 
 	
@@ -37635,7 +37337,7 @@
 
 
 /***/ },
-/* 349 */
+/* 345 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*global Blob,File*/
@@ -37644,8 +37346,8 @@
 	 * Module requirements
 	 */
 
-	var isArray = __webpack_require__(347);
-	var isBuf = __webpack_require__(350);
+	var isArray = __webpack_require__(343);
+	var isBuf = __webpack_require__(346);
 
 	/**
 	 * Replaces every Buffer | ArrayBuffer in packet with a numbered placeholder.
@@ -37783,7 +37485,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 350 */
+/* 346 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -37803,7 +37505,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 351 */
+/* 347 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -37811,15 +37513,15 @@
 	 * Module dependencies.
 	 */
 
-	var eio = __webpack_require__(352);
-	var Socket = __webpack_require__(377);
-	var Emitter = __webpack_require__(378);
-	var parser = __webpack_require__(345);
-	var on = __webpack_require__(380);
-	var bind = __webpack_require__(381);
+	var eio = __webpack_require__(348);
+	var Socket = __webpack_require__(373);
+	var Emitter = __webpack_require__(374);
+	var parser = __webpack_require__(341);
+	var on = __webpack_require__(376);
+	var bind = __webpack_require__(377);
 	var debug = __webpack_require__(20)('socket.io-client:manager');
-	var indexOf = __webpack_require__(375);
-	var Backoff = __webpack_require__(383);
+	var indexOf = __webpack_require__(371);
+	var Backoff = __webpack_require__(379);
 
 	/**
 	 * IE6+ hasOwnProperty
@@ -38366,19 +38068,19 @@
 
 
 /***/ },
-/* 352 */
+/* 348 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	module.exports =  __webpack_require__(353);
+	module.exports =  __webpack_require__(349);
 
 
 /***/ },
-/* 353 */
+/* 349 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	module.exports = __webpack_require__(354);
+	module.exports = __webpack_require__(350);
 
 	/**
 	 * Exports parser
@@ -38386,25 +38088,25 @@
 	 * @api public
 	 *
 	 */
-	module.exports.parser = __webpack_require__(361);
+	module.exports.parser = __webpack_require__(357);
 
 
 /***/ },
-/* 354 */
+/* 350 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var transports = __webpack_require__(355);
-	var Emitter = __webpack_require__(348);
+	var transports = __webpack_require__(351);
+	var Emitter = __webpack_require__(344);
 	var debug = __webpack_require__(20)('engine.io-client:socket');
-	var index = __webpack_require__(375);
-	var parser = __webpack_require__(361);
-	var parseuri = __webpack_require__(344);
-	var parsejson = __webpack_require__(376);
-	var parseqs = __webpack_require__(369);
+	var index = __webpack_require__(371);
+	var parser = __webpack_require__(357);
+	var parseuri = __webpack_require__(340);
+	var parsejson = __webpack_require__(372);
+	var parseqs = __webpack_require__(365);
 
 	/**
 	 * Module exports.
@@ -38528,9 +38230,9 @@
 	 */
 
 	Socket.Socket = Socket;
-	Socket.Transport = __webpack_require__(360);
-	Socket.transports = __webpack_require__(355);
-	Socket.parser = __webpack_require__(361);
+	Socket.Transport = __webpack_require__(356);
+	Socket.transports = __webpack_require__(351);
+	Socket.parser = __webpack_require__(357);
 
 	/**
 	 * Creates transport of the given type.
@@ -39125,17 +38827,17 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 355 */
+/* 351 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies
 	 */
 
-	var XMLHttpRequest = __webpack_require__(356);
-	var XHR = __webpack_require__(358);
-	var JSONP = __webpack_require__(372);
-	var websocket = __webpack_require__(373);
+	var XMLHttpRequest = __webpack_require__(352);
+	var XHR = __webpack_require__(354);
+	var JSONP = __webpack_require__(368);
+	var websocket = __webpack_require__(369);
 
 	/**
 	 * Export transports.
@@ -39185,11 +38887,11 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 356 */
+/* 352 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// browser shim for xmlhttprequest module
-	var hasCORS = __webpack_require__(357);
+	var hasCORS = __webpack_require__(353);
 
 	module.exports = function(opts) {
 	  var xdomain = opts.xdomain;
@@ -39227,7 +38929,7 @@
 
 
 /***/ },
-/* 357 */
+/* 353 */
 /***/ function(module, exports) {
 
 	
@@ -39250,17 +38952,17 @@
 
 
 /***/ },
-/* 358 */
+/* 354 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module requirements.
 	 */
 
-	var XMLHttpRequest = __webpack_require__(356);
-	var Polling = __webpack_require__(359);
-	var Emitter = __webpack_require__(348);
-	var inherit = __webpack_require__(370);
+	var XMLHttpRequest = __webpack_require__(352);
+	var Polling = __webpack_require__(355);
+	var Emitter = __webpack_require__(344);
+	var inherit = __webpack_require__(366);
 	var debug = __webpack_require__(20)('engine.io-client:polling-xhr');
 
 	/**
@@ -39669,18 +39371,18 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 359 */
+/* 355 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var Transport = __webpack_require__(360);
-	var parseqs = __webpack_require__(369);
-	var parser = __webpack_require__(361);
-	var inherit = __webpack_require__(370);
-	var yeast = __webpack_require__(371);
+	var Transport = __webpack_require__(356);
+	var parseqs = __webpack_require__(365);
+	var parser = __webpack_require__(357);
+	var inherit = __webpack_require__(366);
+	var yeast = __webpack_require__(367);
 	var debug = __webpack_require__(20)('engine.io-client:polling');
 
 	/**
@@ -39694,7 +39396,7 @@
 	 */
 
 	var hasXHR2 = (function() {
-	  var XMLHttpRequest = __webpack_require__(356);
+	  var XMLHttpRequest = __webpack_require__(352);
 	  var xhr = new XMLHttpRequest({ xdomain: false });
 	  return null != xhr.responseType;
 	})();
@@ -39922,15 +39624,15 @@
 
 
 /***/ },
-/* 360 */
+/* 356 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var parser = __webpack_require__(361);
-	var Emitter = __webpack_require__(348);
+	var parser = __webpack_require__(357);
+	var Emitter = __webpack_require__(344);
 
 	/**
 	 * Module exports.
@@ -40083,19 +39785,19 @@
 
 
 /***/ },
-/* 361 */
+/* 357 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var keys = __webpack_require__(362);
-	var hasBinary = __webpack_require__(363);
-	var sliceBuffer = __webpack_require__(364);
-	var base64encoder = __webpack_require__(365);
-	var after = __webpack_require__(366);
-	var utf8 = __webpack_require__(367);
+	var keys = __webpack_require__(358);
+	var hasBinary = __webpack_require__(359);
+	var sliceBuffer = __webpack_require__(360);
+	var base64encoder = __webpack_require__(361);
+	var after = __webpack_require__(362);
+	var utf8 = __webpack_require__(363);
 
 	/**
 	 * Check if we are running an android browser. That requires us to use
@@ -40152,7 +39854,7 @@
 	 * Create a blob api even for blob builder when vendor prefixes exist
 	 */
 
-	var Blob = __webpack_require__(368);
+	var Blob = __webpack_require__(364);
 
 	/**
 	 * Encodes a packet.
@@ -40684,7 +40386,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 362 */
+/* 358 */
 /***/ function(module, exports) {
 
 	
@@ -40709,7 +40411,7 @@
 
 
 /***/ },
-/* 363 */
+/* 359 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -40717,7 +40419,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(347);
+	var isArray = __webpack_require__(343);
 
 	/**
 	 * Module exports.
@@ -40774,7 +40476,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 364 */
+/* 360 */
 /***/ function(module, exports) {
 
 	/**
@@ -40809,7 +40511,7 @@
 
 
 /***/ },
-/* 365 */
+/* 361 */
 /***/ function(module, exports) {
 
 	/*
@@ -40874,7 +40576,7 @@
 
 
 /***/ },
-/* 366 */
+/* 362 */
 /***/ function(module, exports) {
 
 	module.exports = after
@@ -40908,7 +40610,7 @@
 
 
 /***/ },
-/* 367 */
+/* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! https://mths.be/utf8js v2.0.0 by @mathias */
@@ -41157,7 +40859,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module), (function() { return this; }())))
 
 /***/ },
-/* 368 */
+/* 364 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -41260,7 +40962,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 369 */
+/* 365 */
 /***/ function(module, exports) {
 
 	/**
@@ -41303,7 +41005,7 @@
 
 
 /***/ },
-/* 370 */
+/* 366 */
 /***/ function(module, exports) {
 
 	
@@ -41315,7 +41017,7 @@
 	};
 
 /***/ },
-/* 371 */
+/* 367 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -41389,7 +41091,7 @@
 
 
 /***/ },
-/* 372 */
+/* 368 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -41397,8 +41099,8 @@
 	 * Module requirements.
 	 */
 
-	var Polling = __webpack_require__(359);
-	var inherit = __webpack_require__(370);
+	var Polling = __webpack_require__(355);
+	var inherit = __webpack_require__(366);
 
 	/**
 	 * Module exports.
@@ -41634,18 +41336,18 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 373 */
+/* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var Transport = __webpack_require__(360);
-	var parser = __webpack_require__(361);
-	var parseqs = __webpack_require__(369);
-	var inherit = __webpack_require__(370);
-	var yeast = __webpack_require__(371);
+	var Transport = __webpack_require__(356);
+	var parser = __webpack_require__(357);
+	var parseqs = __webpack_require__(365);
+	var inherit = __webpack_require__(366);
+	var yeast = __webpack_require__(367);
 	var debug = __webpack_require__(20)('engine.io-client:websocket');
 	var BrowserWebSocket = global.WebSocket || global.MozWebSocket;
 
@@ -41658,7 +41360,7 @@
 	var WebSocket = BrowserWebSocket;
 	if (!WebSocket && typeof window === 'undefined') {
 	  try {
-	    WebSocket = __webpack_require__(374);
+	    WebSocket = __webpack_require__(370);
 	  } catch (e) { }
 	}
 
@@ -41929,13 +41631,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 374 */
+/* 370 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 375 */
+/* 371 */
 /***/ function(module, exports) {
 
 	
@@ -41950,7 +41652,7 @@
 	};
 
 /***/ },
-/* 376 */
+/* 372 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -41988,7 +41690,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 377 */
+/* 373 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -41996,13 +41698,13 @@
 	 * Module dependencies.
 	 */
 
-	var parser = __webpack_require__(345);
-	var Emitter = __webpack_require__(378);
-	var toArray = __webpack_require__(379);
-	var on = __webpack_require__(380);
-	var bind = __webpack_require__(381);
+	var parser = __webpack_require__(341);
+	var Emitter = __webpack_require__(374);
+	var toArray = __webpack_require__(375);
+	var on = __webpack_require__(376);
+	var bind = __webpack_require__(377);
 	var debug = __webpack_require__(20)('socket.io-client:socket');
-	var hasBin = __webpack_require__(382);
+	var hasBin = __webpack_require__(378);
 
 	/**
 	 * Module exports.
@@ -42406,7 +42108,7 @@
 
 
 /***/ },
-/* 378 */
+/* 374 */
 /***/ function(module, exports) {
 
 	
@@ -42573,7 +42275,7 @@
 
 
 /***/ },
-/* 379 */
+/* 375 */
 /***/ function(module, exports) {
 
 	module.exports = toArray
@@ -42592,7 +42294,7 @@
 
 
 /***/ },
-/* 380 */
+/* 376 */
 /***/ function(module, exports) {
 
 	
@@ -42622,7 +42324,7 @@
 
 
 /***/ },
-/* 381 */
+/* 377 */
 /***/ function(module, exports) {
 
 	/**
@@ -42651,7 +42353,7 @@
 
 
 /***/ },
-/* 382 */
+/* 378 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -42659,7 +42361,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(347);
+	var isArray = __webpack_require__(343);
 
 	/**
 	 * Module exports.
@@ -42717,7 +42419,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 383 */
+/* 379 */
 /***/ function(module, exports) {
 
 	
@@ -42806,6 +42508,293 @@
 	};
 
 
+
+/***/ },
+/* 380 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = getClientId;
+
+	var _uuid = __webpack_require__(381);
+
+	var _uuid2 = _interopRequireDefault(_uuid);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var localStorageKey = 'ReactTrivia-clientId';
+
+	function getClientId() {
+	  var id = localStorage.getItem(localStorageKey);
+	  if (!id) {
+	    id = _uuid2.default.v4();
+	    localStorage.setItem(localStorageKey, id);
+	  }
+	  return id;
+	}
+
+/***/ },
+/* 381 */
+/***/ function(module, exports, __webpack_require__) {
+
+	//     uuid.js
+	//
+	//     Copyright (c) 2010-2012 Robert Kieffer
+	//     MIT License - http://opensource.org/licenses/mit-license.php
+
+	// Unique ID creation requires a high quality random # generator.  We feature
+	// detect to determine the best RNG source, normalizing to a function that
+	// returns 128-bits of randomness, since that's what's usually required
+	var _rng = __webpack_require__(382);
+
+	// Maps for number <-> hex string conversion
+	var _byteToHex = [];
+	var _hexToByte = {};
+	for (var i = 0; i < 256; i++) {
+	  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
+	  _hexToByte[_byteToHex[i]] = i;
+	}
+
+	// **`parse()` - Parse a UUID into it's component bytes**
+	function parse(s, buf, offset) {
+	  var i = (buf && offset) || 0, ii = 0;
+
+	  buf = buf || [];
+	  s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
+	    if (ii < 16) { // Don't overflow!
+	      buf[i + ii++] = _hexToByte[oct];
+	    }
+	  });
+
+	  // Zero out remaining bytes if string was short
+	  while (ii < 16) {
+	    buf[i + ii++] = 0;
+	  }
+
+	  return buf;
+	}
+
+	// **`unparse()` - Convert UUID byte array (ala parse()) into a string**
+	function unparse(buf, offset) {
+	  var i = offset || 0, bth = _byteToHex;
+	  return  bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]];
+	}
+
+	// **`v1()` - Generate time-based UUID**
+	//
+	// Inspired by https://github.com/LiosK/UUID.js
+	// and http://docs.python.org/library/uuid.html
+
+	// random #'s we need to init node and clockseq
+	var _seedBytes = _rng();
+
+	// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+	var _nodeId = [
+	  _seedBytes[0] | 0x01,
+	  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+	];
+
+	// Per 4.2.2, randomize (14 bit) clockseq
+	var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+
+	// Previous uuid creation time
+	var _lastMSecs = 0, _lastNSecs = 0;
+
+	// See https://github.com/broofa/node-uuid for API details
+	function v1(options, buf, offset) {
+	  var i = buf && offset || 0;
+	  var b = buf || [];
+
+	  options = options || {};
+
+	  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+	  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+	  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+	  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+	  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+	  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+	  // Per 4.2.1.2, use count of uuid's generated during the current clock
+	  // cycle to simulate higher resolution clock
+	  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+	  // Time since last uuid creation (in msecs)
+	  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+	  // Per 4.2.1.2, Bump clockseq on clock regression
+	  if (dt < 0 && options.clockseq === undefined) {
+	    clockseq = clockseq + 1 & 0x3fff;
+	  }
+
+	  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+	  // time interval
+	  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+	    nsecs = 0;
+	  }
+
+	  // Per 4.2.1.2 Throw error if too many uuids are requested
+	  if (nsecs >= 10000) {
+	    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+	  }
+
+	  _lastMSecs = msecs;
+	  _lastNSecs = nsecs;
+	  _clockseq = clockseq;
+
+	  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+	  msecs += 12219292800000;
+
+	  // `time_low`
+	  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+	  b[i++] = tl >>> 24 & 0xff;
+	  b[i++] = tl >>> 16 & 0xff;
+	  b[i++] = tl >>> 8 & 0xff;
+	  b[i++] = tl & 0xff;
+
+	  // `time_mid`
+	  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+	  b[i++] = tmh >>> 8 & 0xff;
+	  b[i++] = tmh & 0xff;
+
+	  // `time_high_and_version`
+	  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+	  b[i++] = tmh >>> 16 & 0xff;
+
+	  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+	  b[i++] = clockseq >>> 8 | 0x80;
+
+	  // `clock_seq_low`
+	  b[i++] = clockseq & 0xff;
+
+	  // `node`
+	  var node = options.node || _nodeId;
+	  for (var n = 0; n < 6; n++) {
+	    b[i + n] = node[n];
+	  }
+
+	  return buf ? buf : unparse(b);
+	}
+
+	// **`v4()` - Generate random UUID**
+
+	// See https://github.com/broofa/node-uuid for API details
+	function v4(options, buf, offset) {
+	  // Deprecated - 'format' argument, as supported in v1.2
+	  var i = buf && offset || 0;
+
+	  if (typeof(options) == 'string') {
+	    buf = options == 'binary' ? new Array(16) : null;
+	    options = null;
+	  }
+	  options = options || {};
+
+	  var rnds = options.random || (options.rng || _rng)();
+
+	  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+	  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+	  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+	  // Copy bytes to buffer, if provided
+	  if (buf) {
+	    for (var ii = 0; ii < 16; ii++) {
+	      buf[i + ii] = rnds[ii];
+	    }
+	  }
+
+	  return buf || unparse(rnds);
+	}
+
+	// Export public API
+	var uuid = v4;
+	uuid.v1 = v1;
+	uuid.v4 = v4;
+	uuid.parse = parse;
+	uuid.unparse = unparse;
+
+	module.exports = uuid;
+
+
+/***/ },
+/* 382 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {
+	var rng;
+
+	if (global.crypto && crypto.getRandomValues) {
+	  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+	  // Moderately fast, high quality
+	  var _rnds8 = new Uint8Array(16);
+	  rng = function whatwgRNG() {
+	    crypto.getRandomValues(_rnds8);
+	    return _rnds8;
+	  };
+	}
+
+	if (!rng) {
+	  // Math.random()-based (RNG)
+	  //
+	  // If all else fails, use Math.random().  It's fast, but is of unspecified
+	  // quality.
+	  var  _rnds = new Array(16);
+	  rng = function() {
+	    for (var i = 0, r; i < 16; i++) {
+	      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+	      _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+	    }
+
+	    return _rnds;
+	  };
+	}
+
+	module.exports = rng;
+
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 383 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _reduxAct = __webpack_require__(320);
+
+	var _game = __webpack_require__(332);
+
+	var Game = _interopRequireWildcard(_game);
+
+	var _player = __webpack_require__(333);
+
+	var Player = _interopRequireWildcard(_player);
+
+	var _round = __webpack_require__(334);
+
+	var Round = _interopRequireWildcard(_round);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var actions = _extends({}, Game.Actions, Player.Actions, Round.Actions);
+
+	exports.default = actions;
 
 /***/ }
 /******/ ]);

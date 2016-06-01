@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import {Router, Route, hashHistory} from 'react-router'
 import {connect, Provider} from 'react-redux'
 import {assignAll} from 'redux-act'
-import store from './store'
+import store from './makeStore'
 import Actions from './actions'
 import {setState} from './pubsub'
 

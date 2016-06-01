@@ -1,6 +1,5 @@
 import {createStore, applyMiddleware} from 'redux'
 import reducer from './reducer'
-import Actions from './actions'
 import {setupPubSub} from './pubsub'
 
 const wsPort = location.hostname === 'localhost' ? ':8470' : ''
@@ -18,7 +17,7 @@ const createStoreWithMiddleware = applyMiddleware(
 
 const storeCreator = createStoreWithMiddleware
 
-// https://github.com/gaearon/redux-devtools/issues/274, fixed in 1.4.* - NOT
+// https://github.com/gaearon/redux-devtools/issues/274, fixed in 1.4.*
 // const storeCreator = window.devToolsExtension ?
 //     window.devToolsExtension()(createStoreWithMiddleware) :
 //     createStoreWithMiddleware

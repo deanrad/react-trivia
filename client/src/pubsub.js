@@ -4,6 +4,20 @@ import getClientID from './myID'
 
 export let setState = createAction('SET_STATE', state => state, meta => ({clientOnly: true}))
 
+// Takes a reducer, and returns an enhanced one that pre-empts origReducer
+//  in order to handle server updates
+export let createServerUpdatingReducer = (origReducer) =>
+  (state, action) => {
+    // note == below is intentional, to force toString to be called on the actionCreator
+    if (action.type == setState) {
+      console.debug('Updating local state to', state)
+      return {...state, ...action.payload}
+    }
+
+    return origReducer(state, action)
+  }
+
+
 export let setupPubSub = (wsUrl) => {
   console.log(`Making WebSockets connection to ${wsUrl}`)
   let socket = io(wsUrl)
