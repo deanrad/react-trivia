@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "predeps": "rm -rf tmp/deps; mkdir -p tmp/deps; mkdir tmp/deps/client; mkdir tmp/deps/server; echo",
+    "predeps": "rm -rf tmp/deps; mkdir -p tmp/deps/client/src; mkdir tmp/deps/src; echo",
     "deps": "npm run deps:server; npm run deps:client",
-    "deps:server": "babel -d tmp/deps/server index.js; babel -d tmp/deps/server/src src; madge tmp/deps/server -i deps-server.png; open deps-server.png",
-    "deps:client": "babel -d tmp/deps/client client/src; madge tmp/deps/client -i deps-client.png; open deps-client.png",
+    "deps:server": "babel -d tmp/deps/ index.js; babel -d tmp/deps/src src/; madge tmp/deps/*.js tmp/deps/src/* -i deps-server.png; open deps-server.png",
+    "deps:client": "babel -d tmp/deps/client/src client/src; madge tmp/deps/client/src -i deps-client.png; open deps-client.png",
     "start": "babel-node index.js",
     "client": "webpack-dev-server --host 0.0.0.0 --port 3120",
     "test": "echo 'Test soon'",

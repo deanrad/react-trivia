@@ -12,8 +12,10 @@ let stateReducers = combineReducers({
 })
 
 export default (state, action) => {
-  if (action.type === 'SET_STATE')
+  if (action.type === 'SET_STATE') {
+    console.debug('Updating local state to', state)
     return {...state, ...action.payload}
+  }
   else
     return stateReducers(state, action)
 }

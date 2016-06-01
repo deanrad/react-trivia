@@ -2,13 +2,16 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Router, Route, hashHistory} from 'react-router'
 import {connect, Provider} from 'react-redux'
+import {assignAll} from 'redux-act'
 import store from './store'
 import Actions from './actions'
-
-console.debug('loading index')
+import {setState} from './pubsub'
 
 window.Store = store
 window.Actions = Actions
+
+assignAll(Actions, store)
+setState.assignTo(store)
 
 const TestHarness = (props) => (
   <div>

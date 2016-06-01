@@ -1,10 +1,7 @@
 import {createStore, applyMiddleware} from 'redux'
-import {assignAll} from 'redux-act'
 import reducer from './reducer'
 import Actions from './actions'
 import {setupPubSub} from './pubsub'
-
-console.debug('loaded store')
 
 const wsPort = location.hostname === 'localhost' ? ':8470' : ''
 
@@ -27,8 +24,5 @@ const storeCreator = createStoreWithMiddleware
 //     createStoreWithMiddleware
 
 const store = storeCreator(reducer)
-assignAll(Actions, store)
-// event to dispatch when the server has an update for us
-socket.on('state', Actions.setState)
 
 export default store

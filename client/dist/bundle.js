@@ -7515,7 +7515,9 @@
 
 	var _reactRedux = __webpack_require__(302);
 
-	var _store = __webpack_require__(320);
+	var _reduxAct = __webpack_require__(320);
+
+	var _store = __webpack_require__(330);
 
 	var _store2 = _interopRequireDefault(_store);
 
@@ -7525,10 +7527,10 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	console.debug('loading index');
-
 	window.Store = _store2.default;
 	window.Actions = _actions2.default;
+
+	(0, _reduxAct.assignAll)(_actions2.default, _store2.default);
 
 	var TestHarness = function TestHarness(props) {
 	  return _react2.default.createElement(
@@ -34681,65 +34683,9 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _redux = __webpack_require__(309);
-
-	var _reduxAct = __webpack_require__(321);
-
-	var _reducer = __webpack_require__(331);
-
-	var _reducer2 = _interopRequireDefault(_reducer);
-
-	var _actions = __webpack_require__(340);
-
-	var _actions2 = _interopRequireDefault(_actions);
-
-	var _pubsub = __webpack_require__(341);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	console.debug('loaded store');
-
-	var wsPort = location.hostname === 'localhost' ? ':8470' : '';
-
-	// prod is 'http://react-trivia.herokuapp.com'
-	// local is http://localhost:8470
-	var wsUrl = location.protocol + '//' + location.hostname + wsPort;
-
-	var _setupPubSub = (0, _pubsub.setupPubSub)(wsUrl);
-
-	var socket = _setupPubSub.socket;
-	var middleware = _setupPubSub.middleware;
-
-
-	var createStoreWithMiddleware = (0, _redux.applyMiddleware)(middleware)(_redux.createStore);
-
-	var storeCreator = createStoreWithMiddleware;
-
-	// https://github.com/gaearon/redux-devtools/issues/274, fixed in 1.4.*
-	// const storeCreator = window.devToolsExtension ?
-	//     window.devToolsExtension()(createStoreWithMiddleware) :
-	//     createStoreWithMiddleware
-
-	var store = storeCreator(_reducer2.default);
-	(0, _reduxAct.assignAll)(_actions2.default, store);
-	// event to dispatch when the server has an update for us
-	socket.on('state', _actions2.default.setState);
-
-	exports.default = store;
-
-/***/ },
-/* 321 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 	exports.types = exports.loggers = exports.disbatch = exports.batch = exports.bindAll = exports.assignAll = exports.createReducer = exports.createAction = undefined;
 
-	var _createAction = __webpack_require__(322);
+	var _createAction = __webpack_require__(321);
 
 	Object.defineProperty(exports, 'createAction', {
 	  enumerable: true,
@@ -34748,7 +34694,7 @@
 	  }
 	});
 
-	var _createReducer = __webpack_require__(324);
+	var _createReducer = __webpack_require__(323);
 
 	Object.defineProperty(exports, 'createReducer', {
 	  enumerable: true,
@@ -34757,7 +34703,7 @@
 	  }
 	});
 
-	var _assignAll = __webpack_require__(326);
+	var _assignAll = __webpack_require__(325);
 
 	Object.defineProperty(exports, 'assignAll', {
 	  enumerable: true,
@@ -34766,7 +34712,7 @@
 	  }
 	});
 
-	var _bindAll = __webpack_require__(327);
+	var _bindAll = __webpack_require__(326);
 
 	Object.defineProperty(exports, 'bindAll', {
 	  enumerable: true,
@@ -34775,7 +34721,7 @@
 	  }
 	});
 
-	var _batch = __webpack_require__(325);
+	var _batch = __webpack_require__(324);
 
 	Object.defineProperty(exports, 'batch', {
 	  enumerable: true,
@@ -34784,7 +34730,7 @@
 	  }
 	});
 
-	var _disbatch = __webpack_require__(328);
+	var _disbatch = __webpack_require__(327);
 
 	Object.defineProperty(exports, 'disbatch', {
 	  enumerable: true,
@@ -34793,7 +34739,7 @@
 	  }
 	});
 
-	var _loggers = __webpack_require__(329);
+	var _loggers = __webpack_require__(328);
 
 	Object.defineProperty(exports, 'loggers', {
 	  enumerable: true,
@@ -34802,7 +34748,7 @@
 	  }
 	});
 
-	var _types2 = __webpack_require__(323);
+	var _types2 = __webpack_require__(322);
 
 	var _types = _interopRequireWildcard(_types2);
 
@@ -34813,7 +34759,7 @@
 	var types = exports.types = _types;
 
 /***/ },
-/* 322 */
+/* 321 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34826,7 +34772,7 @@
 
 	exports.default = createAction;
 
-	var _types = __webpack_require__(323);
+	var _types = __webpack_require__(322);
 
 	var id = 0;
 
@@ -34981,7 +34927,7 @@
 	};
 
 /***/ },
-/* 323 */
+/* 322 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -35017,7 +34963,7 @@
 	}
 
 /***/ },
-/* 324 */
+/* 323 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35027,7 +34973,7 @@
 	});
 	exports.default = createReducer;
 
-	var _batch = __webpack_require__(325);
+	var _batch = __webpack_require__(324);
 
 	var _batch2 = _interopRequireDefault(_batch);
 
@@ -35106,7 +35052,7 @@
 	};
 
 /***/ },
-/* 325 */
+/* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35115,7 +35061,7 @@
 	  value: true
 	});
 
-	var _createAction = __webpack_require__(322);
+	var _createAction = __webpack_require__(321);
 
 	var _createAction2 = _interopRequireDefault(_createAction);
 
@@ -35133,7 +35079,7 @@
 	});
 
 /***/ },
-/* 326 */
+/* 325 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -35156,7 +35102,7 @@
 	};
 
 /***/ },
-/* 327 */
+/* 326 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -35179,7 +35125,7 @@
 	};
 
 /***/ },
-/* 328 */
+/* 327 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35189,7 +35135,7 @@
 	});
 	exports.default = disbatch;
 
-	var _batch = __webpack_require__(325);
+	var _batch = __webpack_require__(324);
 
 	var _batch2 = _interopRequireDefault(_batch);
 
@@ -35222,7 +35168,7 @@
 	}
 
 /***/ },
-/* 329 */
+/* 328 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35231,7 +35177,7 @@
 	  value: true
 	});
 
-	var _reduxLogger = __webpack_require__(330);
+	var _reduxLogger = __webpack_require__(329);
 
 	var reduxLogger = _interopRequireWildcard(_reduxLogger);
 
@@ -35242,7 +35188,7 @@
 	};
 
 /***/ },
-/* 330 */
+/* 329 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35253,7 +35199,7 @@
 	exports.logger = undefined;
 	exports.actionTransformer = actionTransformer;
 
-	var _batch = __webpack_require__(325);
+	var _batch = __webpack_require__(324);
 
 	var _batch2 = _interopRequireDefault(_batch);
 
@@ -35297,6 +35243,57 @@
 	}
 
 /***/ },
+/* 330 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _redux = __webpack_require__(309);
+
+	var _reducer = __webpack_require__(331);
+
+	var _reducer2 = _interopRequireDefault(_reducer);
+
+	var _actions = __webpack_require__(340);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	var _pubsub = __webpack_require__(341);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var wsPort = location.hostname === 'localhost' ? ':8470' : '';
+
+	// prod is 'http://react-trivia.herokuapp.com'
+	// local is http://localhost:8470
+	var wsUrl = location.protocol + '//' + location.hostname + wsPort;
+
+	var _setupPubSub = (0, _pubsub.setupPubSub)(wsUrl);
+
+	var socket = _setupPubSub.socket;
+	var middleware = _setupPubSub.middleware;
+
+
+	var createStoreWithMiddleware = (0, _redux.applyMiddleware)(middleware)(_redux.createStore);
+
+	var storeCreator = createStoreWithMiddleware;
+
+	// https://github.com/gaearon/redux-devtools/issues/274, fixed in 1.4.*
+	// const storeCreator = window.devToolsExtension ?
+	//     window.devToolsExtension()(createStoreWithMiddleware) :
+	//     createStoreWithMiddleware
+
+	var store = storeCreator(_reducer2.default);
+	// event to dispatch when the server has an update for us
+	socket.on('state', _actions2.default.setState);
+
+	exports.default = store;
+
+/***/ },
 /* 331 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -35338,7 +35335,10 @@
 	});
 
 	exports.default = function (state, action) {
-	  if (action.type === 'SET_STATE') return _extends({}, state, action.payload);else return stateReducers(state, action);
+	  if (action.type === 'SET_STATE') {
+	    console.debug('Updating local state to', state);
+	    return _extends({}, state, action.payload);
+	  } else return stateReducers(state, action);
 	};
 
 /***/ },
@@ -35611,7 +35611,7 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _reduxAct = __webpack_require__(321);
+	var _reduxAct = __webpack_require__(320);
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -35645,7 +35645,7 @@
 	});
 	exports.Reducer = exports.Actions = undefined;
 
-	var _reduxAct = __webpack_require__(321);
+	var _reduxAct = __webpack_require__(320);
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -35676,7 +35676,7 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _reduxAct = __webpack_require__(321);
+	var _reduxAct = __webpack_require__(320);
 
 	var _question = __webpack_require__(338);
 
@@ -35824,7 +35824,7 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _reduxAct = __webpack_require__(321);
+	var _reduxAct = __webpack_require__(320);
 
 	var _game = __webpack_require__(335);
 
@@ -35838,17 +35838,12 @@
 
 	var Round = _interopRequireWildcard(_round);
 
+	var _pubsub = __webpack_require__(341);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	console.debug('loaded actions');
-	var setState = (0, _reduxAct.createAction)('SET_STATE', function (state) {
-	  return state;
-	}, function (meta) {
-	  return { clientOnly: true };
-	});
-
 	var actions = _extends({
-	  setState: setState
+	  setState: _pubsub.setState
 	}, Game.Actions, Player.Actions, Round.Actions);
 
 	exports.default = actions;
@@ -35862,9 +35857,11 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.setupPubSub = undefined;
+	exports.setupPubSub = exports.setState = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _reduxAct = __webpack_require__(320);
 
 	var _socket = __webpack_require__(342);
 
@@ -35876,7 +35873,11 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	console.debug('loaded pubsub');
+	var setState = exports.setState = (0, _reduxAct.createAction)('SET_STATE', function (state) {
+	  return state;
+	}, function (meta) {
+	  return { clientOnly: true };
+	});
 
 	var setupPubSub = exports.setupPubSub = function setupPubSub(wsUrl) {
 	  console.log('Making WebSockets connection to ' + wsUrl);

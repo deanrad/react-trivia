@@ -1,11 +1,13 @@
+import {createAction} from 'redux-act'
 import io from 'socket.io-client'
 import getClientID from './myID'
 
-console.debug('loaded pubsub')
+export let setState = createAction('SET_STATE', state => state, meta => ({clientOnly: true}))
 
 export let setupPubSub = (wsUrl) => {
   console.log(`Making WebSockets connection to ${wsUrl}`)
   let socket = io(wsUrl)
+  socket.on('state', setState)
 
   // middleware to send actions not marked clientOnly to the server
   let middleware = store => next => (action) => {
@@ -23,13 +25,6 @@ export let setupPubSub = (wsUrl) => {
     }
     return applyLocal && next(action)
   }
-
-  // let middleware = store => next => action => {
-  //   console.log('dispatching', action)
-  //   let result = next(action)
-  //   console.log('next state', store.getState())
-  //   return result
-  // }
 
   return {socket, middleware}
 }
