@@ -7556,6 +7556,7 @@
 
 	  var _ref2 = question || {};
 
+	  var id = _ref2.id;
 	  var prompt = _ref2.prompt;
 	  var _ref2$choices = _ref2.choices;
 	  var choices = _ref2$choices === undefined ? [] : _ref2$choices;
@@ -7573,14 +7574,19 @@
 	    _react2.default.createElement(
 	      'div',
 	      null,
-	      choices.map(function (entry) {
+	      choices.map(function (choice) {
 	        return _react2.default.createElement(
 	          'button',
-	          { key: entry },
+	          {
+	            key: choice,
+	            onClick: function onClick() {
+	              return _actions2.default.answerQuestion({ choice: choice, questionId: id });
+	            }
+	          },
 	          _react2.default.createElement(
 	            'h1',
 	            null,
-	            entry
+	            choice
 	          )
 	        );
 	      })
@@ -35344,8 +35350,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _reduxAct = __webpack_require__(321);
+	exports.default = getClientId;
 
 	var _uuid = __webpack_require__(333);
 
@@ -35353,27 +35358,16 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 	var localStorageKey = 'ReactTrivia-clientId';
-
-	var setMyId = (0, _reduxAct.createAction)('SET_MY_ID');
 
 	function getClientId() {
 	  var id = localStorage.getItem(localStorageKey);
 	  if (!id) {
 	    id = _uuid2.default.v4();
-	    localStorage.setItem(key, id);
+	    localStorage.setItem(localStorageKey, id);
 	  }
 	  return id;
 	}
-
-	exports.default = {
-	  action: setMyId,
-	  reducer: (0, _reduxAct.createReducer)(_defineProperty({}, setMyId, function (_, id) {
-	    return id || getClientId();
-	  }), null)
-	};
 
 /***/ },
 /* 333 */
@@ -35676,7 +35670,9 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.Reducer = exports.Actions = exports.initialRound = exports.advanceQuestion = undefined;
+	exports.Reducer = exports.Actions = exports.initialRound = exports.answerQuestion = exports.advanceQuestion = undefined;
+
+	var _createReducer;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -35690,22 +35686,33 @@
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 	var skipClient = [function (payload) {
 	  return payload;
 	}, function (_) {
 	  return { skipClient: true };
 	}];
 	var advanceQuestion = exports.advanceQuestion = _reduxAct.createAction.apply(undefined, ['ADVANCE_QUESTION'].concat(skipClient));
+	var answerQuestion = exports.answerQuestion = _reduxAct.createAction.apply(undefined, ['ANSWER_QUESTION'].concat(skipClient));
 
-	var initialRound = exports.initialRound = { question: null, responses: null };
+	var initialRound = exports.initialRound = { question: null, responses: [] };
 
 	var Actions = exports.Actions = {
-	  advanceQuestion: advanceQuestion
+	  advanceQuestion: advanceQuestion,
+	  answerQuestion: answerQuestion
 	};
 
-	var Reducer = exports.Reducer = (0, _reduxAct.createReducer)(_defineProperty({}, advanceQuestion, function (round, _) {
+	var Reducer = exports.Reducer = (0, _reduxAct.createReducer)((_createReducer = {}, _defineProperty(_createReducer, advanceQuestion, function (round, _) {
 	  return _extends({}, round, { question: _question2.default.nextQuestion(round.question) });
-	}), initialRound);
+	}), _defineProperty(_createReducer, answerQuestion, function (round, answer, meta) {
+	  var choice = answer.choice;
+
+	  return {
+	    question: round.question,
+	    responses: [].concat(_toConsumableArray(round.responses), [{ choice: choice, clientID: meta.clientID }])
+	  };
+	}), _createReducer), initialRound);
 
 /***/ },
 /* 338 */
@@ -35759,6 +35766,7 @@
 
 	[
 	    {
+	      "id": 1,
 	      "prompt": "Mountain Dew was originally slang for:",
 	      "choices": [
 	        "Coffee",
@@ -35769,6 +35777,7 @@
 	      "answer": "Moonshine"
 	    },
 	    {
+	      "id": 2,
 	      "prompt": "The Dependency Inversion Principle applies to Redux because:",
 	      "choices": [
 	        "Redux depends on React",
@@ -35779,6 +35788,7 @@
 	      "answer": "The Store and Reducers know about Actions"
 	    },
 	    {
+	      "id": 3,
 	      "prompt": "JavaScript's creator spent this long creating it:",
 	      "choices": [
 	        "10 hours",
@@ -35789,6 +35799,7 @@
 	      "answer": "10 days"
 	    },
 	    {
+	      "id": 4,
 	      "prompt": "Known as the Father of the Internet, he developed hypertext, which we now call HTML",
 	      "choices": [
 	        "Steve Jobs",
@@ -35815,10 +35826,6 @@
 
 	var _reduxAct = __webpack_require__(321);
 
-	var _myID = __webpack_require__(332);
-
-	var _myID2 = _interopRequireDefault(_myID);
-
 	var _game = __webpack_require__(335);
 
 	var Game = _interopRequireWildcard(_game);
@@ -35833,10 +35840,7 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	console.debug('loaded actions');
-	var setMyID = _myID2.default.action;
 	var setState = (0, _reduxAct.createAction)('SET_STATE', function (state) {
 	  return state;
 	}, function (meta) {
@@ -35844,7 +35848,6 @@
 	});
 
 	var actions = _extends({
-	  setMyID: setMyID,
 	  setState: setState
 	}, Game.Actions, Player.Actions, Round.Actions);
 
@@ -35867,6 +35870,10 @@
 
 	var _socket2 = _interopRequireDefault(_socket);
 
+	var _myID = __webpack_require__(332);
+
+	var _myID2 = _interopRequireDefault(_myID);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	console.debug('loaded pubsub');
@@ -35883,14 +35890,13 @@
 
 	        // some actions need not be applied locally vs let the server handle them
 	        var applyLocal = !(action.meta && action.meta.skipClient);
-	        console.log('in custom middleware, sending to server: ', sendToServer);
+
 	        if (sendToServer) {
-	          var _store$getState = store.getState();
-
-	          var myID = _store$getState.myID;
-
-	          var meta = { clientId: myID };
-	          socket.emit('action', _extends({}, action, { meta: meta }));
+	          var clientID = (0, _myID2.default)();
+	          var meta = { clientID: clientID };
+	          var payload = _extends({}, action, { meta: meta });
+	          console.log('in custom middleware, sending to server: ', payload);
+	          socket.emit('action', payload);
 	        }
 	        return applyLocal && next(action);
 	      };

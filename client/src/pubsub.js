@@ -1,4 +1,5 @@
 import io from 'socket.io-client'
+import getClientID from './myID'
 
 console.debug('loaded pubsub')
 
@@ -12,11 +13,13 @@ export let setupPubSub = (wsUrl) => {
 
     // some actions need not be applied locally vs let the server handle them
     let applyLocal = !(action.meta && action.meta.skipClient)
-    console.log('in custom middleware, sending to server: ', sendToServer)
+
     if (sendToServer) {
-      let {myID} = store.getState()
-      let meta = {clientId: myID}
-      socket.emit('action', {...action, meta})
+      let clientID = getClientID()
+      let meta = {clientID}
+      let payload = {...action, meta}
+      console.log('in custom middleware, sending to server: ', payload)
+      socket.emit('action', payload)
     }
     return applyLocal && next(action)
   }

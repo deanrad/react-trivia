@@ -19,16 +19,19 @@ const TestHarness = (props) => (
 )
 
 const Round = ({question, responses}) => {
-  let {prompt, choices=[]} = question || {}
+  let {id, prompt, choices=[]} = question || {}
 
   return (<div className="voting">
       <div>
         Question: {prompt}
       </div>
       <div>
-      {choices.map(entry =>
-        <button key={entry}>
-          <h1>{entry}</h1>
+      {choices.map(choice =>
+        <button
+          key={choice}
+          onClick={() => Actions.answerQuestion({choice, questionId: id})}
+          >
+          <h1>{choice}</h1>
         </button>
       )}
       </div>
