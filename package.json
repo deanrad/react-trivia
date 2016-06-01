@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deps": "madge index.js src/ -f es6 -i deps.png; open deps.png",
+    "predeps": "rm -rf tmp/deps; mkdir -p tmp/deps; mkdir tmp/deps/client; mkdir tmp/deps/server; echo",
+    "deps": "npm run deps:server; npm run deps:client",
+    "deps:server": "babel -d tmp/deps/server index.js; babel -d tmp/deps/server/src src; madge tmp/deps/server -i deps-server.png; open deps-server.png",
+    "deps:client": "babel -d tmp/deps/client client/src; madge tmp/deps/client -i deps-client.png; open deps-client.png",
     "start": "babel-node index.js",
     "client": "webpack-dev-server --host 0.0.0.0 --port 3120",
     "test": "echo 'Test soon'",
