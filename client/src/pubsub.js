@@ -4,24 +4,27 @@ import getClientID from './myID'
 
 export let setState = createAction('SET_STATE', state => state, meta => ({clientOnly: true}))
 
-// Takes a reducer, and returns an enhanced one that pre-empts origReducer
-//  in order to handle server updates
+// When the server gives us a new state, call the setState action
+let setLocalStateFromServer = (socket) => socket.on('state', setState)
+
+// Create a reducer that siphons off setState events, passing others through
 export let createServerUpdatingReducer = (origReducer) =>
   (state, action) => {
-    // note == below is intentional, to force toString to be called on the actionCreator
-    if (action.type == setState) {
+    if (action.type === 'SET_STATE') {
       console.debug('Updating local state to', state)
+      // overlays the state from the server onto local state
       return {...state, ...action.payload}
     }
-
-    return origReducer(state, action)
+    else {
+      return origReducer(state, action)
+    }
   }
-
 
 export let setupPubSub = (wsUrl) => {
   console.log(`Making WebSockets connection to ${wsUrl}`)
   let socket = io(wsUrl)
-  socket.on('state', setState)
+
+  setLocalStateFromServer(socket)
 
   // middleware to send actions not marked clientOnly to the server
   let middleware = store => next => (action) => {
