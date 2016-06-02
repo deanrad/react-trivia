@@ -21,13 +21,17 @@
     "babel-core": "6.5.1",
     "babel-preset-react": "^6.5.0",
     "chai": "3.5.0",
+    "css-loader": "^0.23.1",
     "mocha": "2.4.5",
+    "postcss-loader": "^0.9.1",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
+    "style-loader": "^0.13.1",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "autoprefixer": "^6.3.6",
     "babel-cli": "^6.5.1",
     "babel-core": "^6.5.1",
     "babel-loader": "^6.2.4",

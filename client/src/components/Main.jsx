@@ -2,6 +2,8 @@ import React from 'react'
 import Actions from '../bindActions'
 import Round from './Round'
 
+require('../style.css')
+
 export default ({game={}, round={}}) => (
   <div>
     <a href="#test">Open Test Harness</a>

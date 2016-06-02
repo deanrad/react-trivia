@@ -1,20 +1,26 @@
 var webpack = require('webpack')
+var autoprefixer = require('autoprefixer')
 
 module.exports = {
   entry: [
     'webpack-dev-server/client?http://localhost:3120',
-    //'webpack/hot/only-dev-server',
     './client/src/index.jsx'
   ],
   module: {
-    loaders: [{
+    loaders: [
+    {
       test: /\.jsx?$/,
       exclude: /node_modules/,
-      loader: 'babel' //'react-hot!babel'
-    }]
+      loader: 'babel'
+    },
+    {
+      test: /\.css$/,
+      loader: 'style!css!postcss'
+    }
+        ]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx', '.json']
+    extensions: ['', '.js', '.jsx', '.json', '.css']
   },
   output: {
     path: __dirname + '/client/dist',
@@ -22,10 +28,9 @@ module.exports = {
     filename: 'bundle.js'
   },
   devServer: {
-    contentBase: './client/dist',
-    //hot: true
+    contentBase: './client/dist'
+  },
+  postcss: function () {
+    return [autoprefixer]
   }
-  // plugins: [
-  //   new webpack.HotModuleReplacementPlugin()
-  // ]
-};
+}
