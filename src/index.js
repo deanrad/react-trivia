@@ -1,3 +1,4 @@
+import path from 'path'
 import http from 'http'
 import express from 'express'
 import Server from 'socket.io'
@@ -11,7 +12,7 @@ import Actions from './actions'
 let port = process.env.PORT || 8470
 
 let app = express()
-app.use(express.static(__dirname + '/client/dist/'))
+app.use(express.static(path.join(__dirname, '../client/dist')))
 let httpServer = http.createServer(app)
 httpServer.listen(port)
 
