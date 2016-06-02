@@ -1,5 +1,5 @@
 import React from 'react'
-import store from '../makeStore'
+import store from '../store'
 import Actions from '../actions'
 
 store.subscribe(() => {

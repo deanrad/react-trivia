@@ -16,5 +16,5 @@ export let Actions = {
 export let Reducer = createReducer({
   [beginGame]: (game, _) => ({...game, status: 'Game On!'}),
   [endGame]: (game, _) => ({...game, status: 'Game Over :('})
-}, initialGame);
+}, initialGame)
 

@@ -13,12 +13,15 @@ export let Actions = {
 }
 
 export let Reducer = createReducer({
-  [advanceQuestion]: (round, _) => ({...round, question: Question.nextQuestion(round.question)}),
+  [advanceQuestion]: (round, _) => ({
+    question: Question.nextQuestion(round.question),
+    responses: []
+  }),
   [answerQuestion]: (round, answer, meta) => {
-    let {choice} = answer
+    let response = {...answer, clientID: meta.clientID}
     return {
       question: round.question,
-      responses: [...round.responses, {choice, clientID: meta.clientID}]
+      responses: [...round.responses, response]
     }
   }
-}, initialRound);
+}, initialRound)

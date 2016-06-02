@@ -4,7 +4,10 @@ import {Router, Route, hashHistory} from 'react-router'
 import {connect, Provider} from 'react-redux'
 import TestHarness from './components/TestHarness'
 import Main from './components/Main'
-import store from './makeStore'
+import store from './store'
+import bindActions from './bindActions'
+
+bindActions(store)
 
 const ConnectedMain = connect(state => state)(Main)
 

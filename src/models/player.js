@@ -8,4 +8,4 @@ export let Actions = {
 
 export let Reducer = createReducer({
   [joinPlayer]: (players, p) => [...players, p]
-}, []);
+}, [])

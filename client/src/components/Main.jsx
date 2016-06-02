@@ -1,5 +1,4 @@
 import React from 'react'
-import Actions from '../bindActions'
 import Round from './Round'
 
 require('../style.css')
