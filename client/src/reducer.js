@@ -2,7 +2,7 @@ import {combineReducers} from 'redux'
 import * as Game from '../../src/models/game'
 import * as Player from '../../src/models/player'
 import * as Round from '../../src/models/round'
-import {createServerUpdatingReducer} from './pubsub'
+import {serverStateReducer} from './pubsub'
 
 let stateReducer = combineReducers({
   game: Game.Reducer,
@@ -10,4 +10,16 @@ let stateReducer = combineReducers({
   round: Round.Reducer
 })
 
-export default createServerUpdatingReducer(stateReducer)
+let applyPreReducers = (preReducers, origReducer) => {
+  return (state, action) => {
+    for(let reducer of preReducers) {
+      let newState = reducer(state, action)
+      if (newState != state) return newState
+    }
+
+    return origReducer(state, action)
+  }
+}
+
+// Create a reducer that siphons off setState events, passing others through
+export default applyPreReducers([serverStateReducer], stateReducer)

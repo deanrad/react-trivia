@@ -1,4 +1,4 @@
-import {createAction} from 'redux-act'
+import {createAction, createReducer} from 'redux-act'
 import io from 'socket.io-client'
 import getClientID from './myID'
 
