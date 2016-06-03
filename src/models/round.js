@@ -1,7 +1,7 @@
 import {createAction, createReducer} from 'redux-act'
 import Question from './question'
+import {skipClient} from '../actionMeta'
 
-let skipClient = [payload => payload, _ => ({skipClient: true})]
 export let advanceQuestion = createAction('ADVANCE_QUESTION', ...skipClient)
 export let answerQuestion = createAction('ANSWER_QUESTION', ...skipClient)
 

@@ -1,24 +1,17 @@
 import {createAction, createReducer} from 'redux-act'
 import io from 'socket.io-client'
 import getClientID from './myID'
+import {clientOnly} from '../../src/actionMeta'
 
-export let setState = createAction('SET_STATE', state => state, meta => ({clientOnly: true}))
+export let setState = createAction('SET_STATE', ...clientOnly)
 
 // When the server gives us a new state, call the setState action
 let setLocalStateFromServer = (socket) => socket.on('state', setState)
 
-// Create a reducer that siphons off setState events, passing others through
-export let createServerUpdatingReducer = (origReducer) =>
-  (state, action) => {
-    if (action.type === 'SET_STATE') {
-      console.debug('Updating local state to', state)
-      // overlays the state from the server onto local state
-      return {...state, ...action.payload}
-    }
-    else {
-      return origReducer(state, action)
-    }
-  }
+// A reducer that overlays server-provided states onto our existing one
+export let serverStateReducer = createReducer({
+  [setState]: (existingState, serverState) => ({...existingState, ...serverState})
+})
 
 export let setupPubSub = (wsUrl) => {
   console.log(`Making WebSockets connection to ${wsUrl}`)
