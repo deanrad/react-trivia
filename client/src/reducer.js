@@ -12,7 +12,7 @@ let stateReducer = combineReducers({
 
 let applyPreReducers = (preReducers, origReducer) => {
   return (state, action) => {
-    for(let reducer of preReducers) {
+    for (let reducer of preReducers) {
       let newState = reducer(state, action)
       if (newState != state) return newState
     }

@@ -12,7 +12,8 @@
     "client": "webpack-dev-server --host 0.0.0.0 --port 3120",
     "test": "echo 'Test soon'",
     "test:watch": "npm run test -- --watch",
-    "deploy": "webpack && git add client/ && git commit -m 'rebundle' && git push heroku master"
+    "deploy": "webpack && git add client/ && git commit -m 'rebundle' && git push heroku master",
+    "repl": "node -r reify/repl --use_strict"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,7 @@
     "css-loader": "^0.23.1",
     "mocha": "2.4.5",
     "postcss-loader": "^0.9.1",
+    "reify": "^0.2.1",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "style-loader": "^0.13.1",

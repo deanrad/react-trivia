@@ -24,4 +24,5 @@ const storeCreator = createStoreWithMiddleware
 
 const store = storeCreator(reducer)
 
+window.store = store
 export default store

@@ -8,6 +8,14 @@ button[disabled] {
   opacity: 0.5;
 }
 
+button.pending {
+  border: orange dashed 3px;
+}
+
+button.accepted {
+  border: green solid 3px;
+}
+
 /* Voting Screen */
 
 .voting {
@@ -27,7 +35,7 @@ button[disabled] {
   flex: 1 0 0;
 
   /*background-color: #673AB7;*/
-  border-width: 0;
+  /*border-width: 0;*/
 }
 .voting button:first-child {
   border-bottom: 1px solid white;

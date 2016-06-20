@@ -1,8 +1,8 @@
 import React from 'react'
-import Actions from '../actions'
+import VoteButton from './VoteButton'
 
 export default ({question, responses}) => {
-  let {id, prompt, choices=[]} = question || {}
+  let {prompt, choices=[]} = question || {}
 
   return (
   <div>
@@ -11,14 +11,7 @@ export default ({question, responses}) => {
     </div>
 
     <div className="voting">
-      {choices.map(choice =>
-        <button
-          key={choice}
-          onClick={() => Actions.answerQuestion({choice, questionId: id})}
-          >
-          <h1>{choice}</h1>
-        </button>
-      )}
+      {choices.map(choice => VoteButton({choice, question, responses}))}
     </div>
   </div>)
 }
