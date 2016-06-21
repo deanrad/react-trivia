@@ -1,24 +1,28 @@
 import React from 'react'
 import Actions from '../actions'
-import getClientID from '../myID'
 
-const displayStyle = ({responses, choice, myID}) => {
+const displayStyle = ({choice, myID, question, responses, judged}) => {
+
   let myResponse = responses.find(r => r.clientID == myID)
   let myChoice = myResponse && myResponse.choice
   let myChoiceConfirmed = myResponse && myResponse.acceptedAt
+  let myChoiceReceived = myResponse && myResponse.receivedAt
 
   // they havent answered
   if (!myResponse) return ''
   // this button isnt for their answer
   if (myChoice !== choice) return ''
 
-  return myChoiceConfirmed ? 'accepted' : 'pending'
+  if (!myChoiceReceived) return 'pending'
+  if (!judged) return 'pending'
+
+  return myChoiceConfirmed ? 'accepted' : 'incorrect'
 }
 
-export default ({choice, question, responses}) => (
+export default ({choice, question, responses, judged, myID}) => (
   <button
-    disabled={responses.length > 0}
-    className={displayStyle({choice, responses, myID: getClientID()})}
+    disabled={judged || responses.filter(r => r.clientID == myID).length > 0}
+    className={displayStyle({choice, question, responses, judged, myID})}
     key={choice}
     onClick={() => Actions.answerQuestion({choice, questionId: question.id})}
     >

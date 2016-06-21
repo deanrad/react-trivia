@@ -4,12 +4,14 @@ import {skipClient} from '../actionMeta'
 
 export let advanceQuestion = createAction('ADVANCE_QUESTION', ...skipClient)
 export let answerQuestion = createAction('ANSWER_QUESTION', ...skipClient)
+export let judgeQuestion = createAction('JUDGE_QUESTION', ...skipClient)
 
 export let initialRound = {question: null, responses: []}
 
 export let Actions = {
   advanceQuestion,
-  answerQuestion
+  answerQuestion,
+  judgeQuestion
 }
 
 export let Reducer = createReducer({
@@ -22,6 +24,13 @@ export let Reducer = createReducer({
     return {
       question: round.question,
       responses: [...round.responses, response]
+    }
+  },
+  [judgeQuestion]: (round, _) => {
+    return {
+      question: round.question,
+      responses: round.responses,
+      judged: true
     }
   }
 }, initialRound)

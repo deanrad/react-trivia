@@ -11,6 +11,8 @@ export default (props) => (
   <div>
     <h2>Action Triggers</h2>
     <hr/>
+    <button onClick={() => Actions.judgeQuestion()}>Judge Question</button>
+     <hr/>
     <button onClick={() => Actions.advanceQuestion()}>Advance Question</button>
      <hr/>
      <p/>

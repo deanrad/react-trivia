@@ -1,7 +1,11 @@
 import React from 'react'
 import VoteButton from './VoteButton'
 
-export default ({question, responses}) => {
+import getClientID from '../myID'
+
+let myID = getClientID()
+
+export default ({question, responses, judged}) => {
   let {prompt, choices=[]} = question || {}
 
   return (
@@ -11,7 +15,9 @@ export default ({question, responses}) => {
     </div>
 
     <div className="voting">
-      {choices.map(choice => VoteButton({choice, question, responses}))}
+      {choices.map(choice => VoteButton({myID, choice, question, responses, judged}))}
     </div>
+
+    {judged && <div className="answer">The Answer Was:<br/> {question.answer} </div>}
   </div>)
 }

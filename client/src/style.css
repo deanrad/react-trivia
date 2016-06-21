@@ -16,6 +16,10 @@ button.accepted {
   border: green solid 3px;
 }
 
+button.incorrect {
+  border: red solid 3px;
+}
+
 /* Voting Screen */
 
 .voting {
