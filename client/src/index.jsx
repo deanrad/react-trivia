@@ -5,9 +5,7 @@ import {connect, Provider} from 'react-redux'
 import TestHarness from './components/TestHarness'
 import Main from './components/Main'
 import store from './store'
-import bindActions from './bindActions'
-
-bindActions(store)
+import pubsub from './pubsub'
 
 const ConnectedMain = connect(state => state)(Main)
 
