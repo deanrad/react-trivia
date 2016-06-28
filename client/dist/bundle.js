@@ -7519,7 +7519,7 @@
 
 	var _TestHarness2 = _interopRequireDefault(_TestHarness);
 
-	var _Main = __webpack_require__(385);
+	var _Main = __webpack_require__(340);
 
 	var _Main2 = _interopRequireDefault(_Main);
 
@@ -7527,13 +7527,11 @@
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _bindActions = __webpack_require__(391);
+	var _pubsub = __webpack_require__(350);
 
-	var _bindActions2 = _interopRequireDefault(_bindActions);
+	var _pubsub2 = _interopRequireDefault(_pubsub);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	(0, _bindActions2.default)(_store2.default);
 
 	var ConnectedMain = (0, _reactRedux.connect)(function (state) {
 	  return state;
@@ -34592,7 +34590,7 @@
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _actions = __webpack_require__(384);
+	var _actions = __webpack_require__(339);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
@@ -34611,6 +34609,14 @@
 	      'h2',
 	      null,
 	      'Action Triggers'
+	    ),
+	    _react2.default.createElement('hr', null),
+	    _react2.default.createElement(
+	      'button',
+	      { onClick: function onClick() {
+	          return _actions2.default.judgeQuestion();
+	        } },
+	      'Judge'
 	    ),
 	    _react2.default.createElement('hr', null),
 	    _react2.default.createElement(
@@ -34642,33 +34648,16 @@
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
-	var _pubsub = __webpack_require__(338);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var wsPort = location.hostname === 'localhost' ? ':8470' : '';
-
-	// prod is 'http://react-trivia.herokuapp.com'
-	// local is http://localhost:8470
-	var wsUrl = location.protocol + '//' + location.hostname + wsPort;
-
-	var _setupPubSub = (0, _pubsub.setupPubSub)(wsUrl);
-
-	var socket = _setupPubSub.socket;
-	var middleware = _setupPubSub.middleware;
-
-
-	var createStoreWithMiddleware = (0, _redux.applyMiddleware)(middleware)(_redux.createStore);
-
-	var storeCreator = createStoreWithMiddleware;
 
 	// https://github.com/gaearon/redux-devtools/issues/274, fixed in 1.4.*
 	// const storeCreator = window.devToolsExtension ?
 	//     window.devToolsExtension()(createStoreWithMiddleware) :
 	//     createStoreWithMiddleware
 
-	var store = storeCreator(_reducer2.default);
+	var store = (0, _redux.createStore)(_reducer2.default);
 
+	window.store = store;
 	exports.default = store;
 
 /***/ },
@@ -34680,6 +34669,12 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	exports.default = function (oldState, action) {
+	  if (action.type === 'setState') return action.payload;
+
+	  return stateReducer(oldState, action);
+	};
 
 	var _redux = __webpack_require__(309);
 
@@ -34695,8 +34690,6 @@
 
 	var Round = _interopRequireWildcard(_round);
 
-	var _pubsub = __webpack_require__(338);
-
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	var stateReducer = (0, _redux.combineReducers)({
@@ -34705,7 +34698,7 @@
 	  round: Round.Reducer
 	});
 
-	exports.default = (0, _pubsub.createServerUpdatingReducer)(stateReducer);
+	// Siphon off setState calls, passing others through
 
 /***/ },
 /* 323 */
@@ -35349,7 +35342,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.Reducer = exports.Actions = exports.initialRound = exports.answerQuestion = exports.advanceQuestion = undefined;
+	exports.Reducer = exports.Actions = exports.initialRound = exports.judgeQuestion = exports.answerQuestion = exports.advanceQuestion = undefined;
 
 	var _createReducer;
 
@@ -35361,25 +35354,24 @@
 
 	var _question2 = _interopRequireDefault(_question);
 
+	var _actionMeta = __webpack_require__(338);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-	var skipClient = [function (payload) {
-	  return payload;
-	}, function (_) {
-	  return { skipClient: true };
-	}];
-	var advanceQuestion = exports.advanceQuestion = _reduxAct.createAction.apply(undefined, ['ADVANCE_QUESTION'].concat(skipClient));
-	var answerQuestion = exports.answerQuestion = _reduxAct.createAction.apply(undefined, ['ANSWER_QUESTION'].concat(skipClient));
+	var advanceQuestion = exports.advanceQuestion = _reduxAct.createAction.apply(undefined, ['ADVANCE_QUESTION'].concat(_toConsumableArray(_actionMeta.skipClient)));
+	var answerQuestion = exports.answerQuestion = _reduxAct.createAction.apply(undefined, ['ANSWER_QUESTION'].concat(_toConsumableArray(_actionMeta.skipClient)));
+	var judgeQuestion = exports.judgeQuestion = _reduxAct.createAction.apply(undefined, ['JUDGE_QUESTION'].concat(_toConsumableArray(_actionMeta.skipClient)));
 
 	var initialRound = exports.initialRound = { question: null, responses: [] };
 
 	var Actions = exports.Actions = {
 	  advanceQuestion: advanceQuestion,
-	  answerQuestion: answerQuestion
+	  answerQuestion: answerQuestion,
+	  judgeQuestion: judgeQuestion
 	};
 
 	var Reducer = exports.Reducer = (0, _reduxAct.createReducer)((_createReducer = {}, _defineProperty(_createReducer, advanceQuestion, function (round, _) {
@@ -35392,6 +35384,12 @@
 	  return {
 	    question: round.question,
 	    responses: [].concat(_toConsumableArray(round.responses), [response])
+	  };
+	}), _defineProperty(_createReducer, judgeQuestion, function (round, _) {
+	  return {
+	    question: round.question,
+	    responses: round.responses,
+	    judged: true
 	  };
 	}), _createReducer), initialRound);
 
@@ -35495,6 +35493,31 @@
 
 /***/ },
 /* 338 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var identity = function identity(payload) {
+	  return payload;
+	};
+
+	// to be used createAction('FOO', ...skipClient)
+
+	// declares this action to not need to be applied to client
+	var skipClient = exports.skipClient = [identity, function (_) {
+	  return { skipClient: true };
+	}];
+
+	// declares this action as not being replicated to server
+	var clientOnly = exports.clientOnly = [identity, function (_) {
+	  return { clientOnly: true };
+	}];
+
+/***/ },
+/* 339 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35502,78 +35525,908 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.setupPubSub = exports.createServerUpdatingReducer = exports.setState = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var _reduxAct = __webpack_require__(324);
 
-	var _socket = __webpack_require__(339);
+	var _game = __webpack_require__(323);
 
-	var _socket2 = _interopRequireDefault(_socket);
+	var Game = _interopRequireWildcard(_game);
 
-	var _myID = __webpack_require__(381);
+	var _player = __webpack_require__(334);
+
+	var Player = _interopRequireWildcard(_player);
+
+	var _round = __webpack_require__(335);
+
+	var Round = _interopRequireWildcard(_round);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var actions = _extends({}, Game.Actions, Player.Actions, Round.Actions);
+
+	exports.default = actions;
+
+/***/ },
+/* 340 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(75);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Round = __webpack_require__(341);
+
+	var _Round2 = _interopRequireDefault(_Round);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	__webpack_require__(346);
+
+	exports.default = function (_ref) {
+	  var _ref$game = _ref.game;
+	  var game = _ref$game === undefined ? {} : _ref$game;
+	  var _ref$round = _ref.round;
+	  var round = _ref$round === undefined ? {} : _ref$round;
+	  return _react2.default.createElement(
+	    'div',
+	    null,
+	    _react2.default.createElement(
+	      'a',
+	      { href: '#test' },
+	      'Open Test Harness'
+	    ),
+	    _react2.default.createElement(
+	      'h3',
+	      null,
+	      'Game: ',
+	      game.title,
+	      _react2.default.createElement(
+	        'i',
+	        null,
+	        '(',
+	        game.status,
+	        ')'
+	      ),
+	      _react2.default.createElement(_Round2.default, round)
+	    )
+	  );
+	};
+
+/***/ },
+/* 341 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(75);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _VoteButton = __webpack_require__(342);
+
+	var _VoteButton2 = _interopRequireDefault(_VoteButton);
+
+	var _myID = __webpack_require__(343);
 
 	var _myID2 = _interopRequireDefault(_myID);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var setState = exports.setState = (0, _reduxAct.createAction)('SET_STATE', function (state) {
-	  return state;
-	}, function (meta) {
-	  return { clientOnly: true };
-	});
+	var myID = (0, _myID2.default)();
 
-	// When the server gives us a new state, call the setState action
-	var setLocalStateFromServer = function setLocalStateFromServer(socket) {
-	  return socket.on('state', setState);
-	};
+	exports.default = function (_ref) {
+	  var question = _ref.question;
+	  var responses = _ref.responses;
+	  var judged = _ref.judged;
 
-	// Create a reducer that siphons off setState events, passing others through
-	var createServerUpdatingReducer = exports.createServerUpdatingReducer = function createServerUpdatingReducer(origReducer) {
-	  return function (state, action) {
-	    if (action.type === 'SET_STATE') {
-	      console.debug('Updating local state to', state);
-	      // overlays the state from the server onto local state
-	      return _extends({}, state, action.payload);
-	    } else {
-	      return origReducer(state, action);
-	    }
-	  };
-	};
+	  var _ref2 = question || {};
 
-	var setupPubSub = exports.setupPubSub = function setupPubSub(wsUrl) {
-	  console.log('Making WebSockets connection to ' + wsUrl);
-	  var socket = (0, _socket2.default)(wsUrl);
+	  var prompt = _ref2.prompt;
+	  var _ref2$choices = _ref2.choices;
+	  var choices = _ref2$choices === undefined ? [] : _ref2$choices;
 
-	  setLocalStateFromServer(socket);
 
-	  // middleware to send actions not marked clientOnly to the server
-	  var middleware = function middleware(store) {
-	    return function (next) {
-	      return function (action) {
-	        var sendToServer = !(action.meta && action.meta.clientOnly);
-
-	        // some actions need not be applied locally vs let the server handle them
-	        var applyLocal = !(action.meta && action.meta.skipClient);
-
-	        if (sendToServer) {
-	          var clientID = (0, _myID2.default)();
-	          var meta = { clientID: clientID };
-	          var payload = _extends({}, action, { meta: meta });
-	          console.log('in custom middleware, sending to server: ', payload);
-	          socket.emit('action', payload);
-	        }
-	        return applyLocal && next(action);
-	      };
-	    };
-	  };
-
-	  return { socket: socket, middleware: middleware };
+	  return _react2.default.createElement(
+	    'div',
+	    null,
+	    _react2.default.createElement(
+	      'div',
+	      null,
+	      'Question: ',
+	      prompt
+	    ),
+	    _react2.default.createElement(
+	      'div',
+	      { className: 'voting' },
+	      choices.map(function (choice) {
+	        return (0, _VoteButton2.default)({ myID: myID, choice: choice, question: question, responses: responses, judged: judged });
+	      })
+	    ),
+	    judged && _react2.default.createElement(
+	      'div',
+	      { className: 'answer' },
+	      'The Answer Was:',
+	      _react2.default.createElement('br', null),
+	      ' ',
+	      question.answer,
+	      ' '
+	    )
+	  );
 	};
 
 /***/ },
-/* 339 */
+/* 342 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(75);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _actions = __webpack_require__(339);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var displayStyle = function displayStyle(_ref) {
+	  var choice = _ref.choice;
+	  var myID = _ref.myID;
+	  var question = _ref.question;
+	  var responses = _ref.responses;
+	  var judged = _ref.judged;
+
+
+	  var myResponse = responses.find(function (r) {
+	    return r.clientID == myID;
+	  });
+	  var myChoice = myResponse && myResponse.choice;
+	  var myChoiceConfirmed = myResponse && myResponse.acceptedAt;
+	  var myChoiceReceived = myResponse && myResponse.receivedAt;
+
+	  // they havent answered
+	  if (!myResponse) return '';
+	  // this button isnt for their answer
+	  if (myChoice !== choice) return '';
+
+	  if (!myChoiceReceived) return 'pending';
+	  if (!judged) return 'pending';
+
+	  return myChoiceConfirmed ? 'accepted' : 'incorrect';
+	};
+
+	exports.default = function (_ref2) {
+	  var choice = _ref2.choice;
+	  var question = _ref2.question;
+	  var responses = _ref2.responses;
+	  var judged = _ref2.judged;
+	  var myID = _ref2.myID;
+	  return _react2.default.createElement(
+	    'button',
+	    {
+	      disabled: judged || responses.filter(function (r) {
+	        return r.clientID == myID;
+	      }).length > 0,
+	      className: displayStyle({ choice: choice, question: question, responses: responses, judged: judged, myID: myID }),
+	      key: choice,
+	      onClick: function onClick() {
+	        return _actions2.default.answerQuestion({ choice: choice, questionId: question.id });
+	      }
+	    },
+	    _react2.default.createElement(
+	      'h1',
+	      null,
+	      choice
+	    )
+	  );
+	};
+
+/***/ },
+/* 343 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = getClientId;
+
+	var _uuid = __webpack_require__(344);
+
+	var _uuid2 = _interopRequireDefault(_uuid);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var localStorageKey = 'ReactTrivia-clientId';
+
+	function getClientId() {
+	  var id = localStorage.getItem(localStorageKey);
+	  if (!id) {
+	    id = _uuid2.default.v4();
+	    localStorage.setItem(localStorageKey, id);
+	  }
+	  return id;
+	}
+
+/***/ },
+/* 344 */
+/***/ function(module, exports, __webpack_require__) {
+
+	//     uuid.js
+	//
+	//     Copyright (c) 2010-2012 Robert Kieffer
+	//     MIT License - http://opensource.org/licenses/mit-license.php
+
+	// Unique ID creation requires a high quality random # generator.  We feature
+	// detect to determine the best RNG source, normalizing to a function that
+	// returns 128-bits of randomness, since that's what's usually required
+	var _rng = __webpack_require__(345);
+
+	// Maps for number <-> hex string conversion
+	var _byteToHex = [];
+	var _hexToByte = {};
+	for (var i = 0; i < 256; i++) {
+	  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
+	  _hexToByte[_byteToHex[i]] = i;
+	}
+
+	// **`parse()` - Parse a UUID into it's component bytes**
+	function parse(s, buf, offset) {
+	  var i = (buf && offset) || 0, ii = 0;
+
+	  buf = buf || [];
+	  s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
+	    if (ii < 16) { // Don't overflow!
+	      buf[i + ii++] = _hexToByte[oct];
+	    }
+	  });
+
+	  // Zero out remaining bytes if string was short
+	  while (ii < 16) {
+	    buf[i + ii++] = 0;
+	  }
+
+	  return buf;
+	}
+
+	// **`unparse()` - Convert UUID byte array (ala parse()) into a string**
+	function unparse(buf, offset) {
+	  var i = offset || 0, bth = _byteToHex;
+	  return  bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]];
+	}
+
+	// **`v1()` - Generate time-based UUID**
+	//
+	// Inspired by https://github.com/LiosK/UUID.js
+	// and http://docs.python.org/library/uuid.html
+
+	// random #'s we need to init node and clockseq
+	var _seedBytes = _rng();
+
+	// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+	var _nodeId = [
+	  _seedBytes[0] | 0x01,
+	  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+	];
+
+	// Per 4.2.2, randomize (14 bit) clockseq
+	var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+
+	// Previous uuid creation time
+	var _lastMSecs = 0, _lastNSecs = 0;
+
+	// See https://github.com/broofa/node-uuid for API details
+	function v1(options, buf, offset) {
+	  var i = buf && offset || 0;
+	  var b = buf || [];
+
+	  options = options || {};
+
+	  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+	  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+	  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+	  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+	  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+	  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+	  // Per 4.2.1.2, use count of uuid's generated during the current clock
+	  // cycle to simulate higher resolution clock
+	  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+	  // Time since last uuid creation (in msecs)
+	  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+	  // Per 4.2.1.2, Bump clockseq on clock regression
+	  if (dt < 0 && options.clockseq === undefined) {
+	    clockseq = clockseq + 1 & 0x3fff;
+	  }
+
+	  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+	  // time interval
+	  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+	    nsecs = 0;
+	  }
+
+	  // Per 4.2.1.2 Throw error if too many uuids are requested
+	  if (nsecs >= 10000) {
+	    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+	  }
+
+	  _lastMSecs = msecs;
+	  _lastNSecs = nsecs;
+	  _clockseq = clockseq;
+
+	  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+	  msecs += 12219292800000;
+
+	  // `time_low`
+	  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+	  b[i++] = tl >>> 24 & 0xff;
+	  b[i++] = tl >>> 16 & 0xff;
+	  b[i++] = tl >>> 8 & 0xff;
+	  b[i++] = tl & 0xff;
+
+	  // `time_mid`
+	  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+	  b[i++] = tmh >>> 8 & 0xff;
+	  b[i++] = tmh & 0xff;
+
+	  // `time_high_and_version`
+	  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+	  b[i++] = tmh >>> 16 & 0xff;
+
+	  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+	  b[i++] = clockseq >>> 8 | 0x80;
+
+	  // `clock_seq_low`
+	  b[i++] = clockseq & 0xff;
+
+	  // `node`
+	  var node = options.node || _nodeId;
+	  for (var n = 0; n < 6; n++) {
+	    b[i + n] = node[n];
+	  }
+
+	  return buf ? buf : unparse(b);
+	}
+
+	// **`v4()` - Generate random UUID**
+
+	// See https://github.com/broofa/node-uuid for API details
+	function v4(options, buf, offset) {
+	  // Deprecated - 'format' argument, as supported in v1.2
+	  var i = buf && offset || 0;
+
+	  if (typeof(options) == 'string') {
+	    buf = options == 'binary' ? new Array(16) : null;
+	    options = null;
+	  }
+	  options = options || {};
+
+	  var rnds = options.random || (options.rng || _rng)();
+
+	  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+	  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+	  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+	  // Copy bytes to buffer, if provided
+	  if (buf) {
+	    for (var ii = 0; ii < 16; ii++) {
+	      buf[i + ii] = rnds[ii];
+	    }
+	  }
+
+	  return buf || unparse(rnds);
+	}
+
+	// Export public API
+	var uuid = v4;
+	uuid.v1 = v1;
+	uuid.v4 = v4;
+	uuid.parse = parse;
+	uuid.unparse = unparse;
+
+	module.exports = uuid;
+
+
+/***/ },
+/* 345 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {
+	var rng;
+
+	if (global.crypto && crypto.getRandomValues) {
+	  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+	  // Moderately fast, high quality
+	  var _rnds8 = new Uint8Array(16);
+	  rng = function whatwgRNG() {
+	    crypto.getRandomValues(_rnds8);
+	    return _rnds8;
+	  };
+	}
+
+	if (!rng) {
+	  // Math.random()-based (RNG)
+	  //
+	  // If all else fails, use Math.random().  It's fast, but is of unspecified
+	  // quality.
+	  var  _rnds = new Array(16);
+	  rng = function() {
+	    for (var i = 0, r; i < 16; i++) {
+	      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+	      _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+	    }
+
+	    return _rnds;
+	  };
+	}
+
+	module.exports = rng;
+
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 346 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(347);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(349)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/postcss-loader/index.js!./style.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/postcss-loader/index.js!./style.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 347 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(348)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "body {\n  font-family: 'Open Sans', sans-serif;\n/*  background-color: #673AB7;\n  color: white;\n*/}\n\nbutton[disabled] {\n  opacity: 0.5;\n}\n\nbutton.pending {\n  border: orange dashed 3px;\n}\n\nbutton.accepted {\n  border: green solid 3px;\n}\n\nbutton.incorrect {\n  border: red solid 3px;\n}\n\n/* Voting Screen */\n\n.voting {\n/*  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n\n  -webkit-user-select: none;\n\n     -moz-user-select: none;\n\n      -ms-user-select: none;\n\n          user-select: none;\n}\n\n.voting button {\n  -webkit-box-flex: 1;\n      -ms-flex: 1 0 0;\n          flex: 1 0 0;\n\n  /*background-color: #673AB7;*/\n  /*border-width: 0;*/\n}\n.voting button:first-child {\n  border-bottom: 1px solid white;\n}\n.voting button:active {\n  background-color: white;\n  color: #311B92;\n}\n.voting button.voted {\n  background-color: #311B92;\n}\n.voting button:not(.voted) .label {\n  visibility: hidden;\n}\n.voting button .label {\n  opacity: 0.87;\n}\n.voting button.votedAgainst * {\n  opacity: 0.3;\n}\n\n@media only screen and (min-width: 500px) {\n  .voting {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n        -ms-flex-direction: row;\n            flex-direction: row;\n  }\n  .voting button:first-child {\n    border-bottom-width: 0;\n    border-right: 1px solid white;\n  }\n}\n\n/* Results Screen */\n\n.results {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n\n  display: -webkit-box;\n\n  display: -ms-flexbox;\n\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n}\n.results .tally {\n  -webkit-box-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n\n  display: -webkit-box;\n\n  display: -ms-flexbox;\n\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n}\n.results .tally .entry {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: distribute;\n      justify-content: space-around;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n\n.results .tally h1 {\n  width: 25%;\n}\n.results .tally .voteVisualization {\n  height: 50px;\n  width: 50%;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: start;\n      -ms-flex-pack: start;\n          justify-content: flex-start;\n\n  background-color: #7E57C2;\n}\n.results .tally .votesBlock {\n  background-color: white;\n  -webkit-transition: width 0.5s;\n  transition: width 0.5s;\n}\n.results .tally .voteCount {\n  font-size: 2rem;\n}\n\n.results .management {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n\n  height: 2em;\n  border-top: 1px solid #aaa;\n}\n\n.results .management button {\n  border: 0;\n  background-color: black;\n  color: #aaa;\n}\n.results .management .next {\n  -webkit-box-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n\n/* Winner View */\n\n.winner {\n  font-size: 4rem;\n  text-align: center;\n}\n\n/* Connection State */\n\n.connectionState {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n\n  padding: 5px;\n\n  text-align: center;\n\n  background-color: #B71C1C;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 348 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 349 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 350 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _bindActions = __webpack_require__(351);
+
+	var _bindActions2 = _interopRequireDefault(_bindActions);
+
+	var _stateSubscriber = __webpack_require__(395);
+
+	var _stateSubscriber2 = _interopRequireDefault(_stateSubscriber);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	(0, _bindActions2.default)(store);
+
+/***/ },
+/* 351 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _reduxAct = __webpack_require__(324);
+
+	var _actions = __webpack_require__(339);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	var _socket = __webpack_require__(352);
+
+	var _socket2 = _interopRequireDefault(_socket);
+
+	var _actionMeta = __webpack_require__(338);
+
+	var _myID = __webpack_require__(343);
+
+	var _myID2 = _interopRequireDefault(_myID);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function (store) {
+	  return (0, _reduxAct.assignAll)(_actions2.default, function (action) {
+	    //mark for this user
+	    action.meta.clientID = (0, _myID2.default)();
+
+	    if (!action.meta.skipClient) store.dispatch(action);
+
+	    _socket2.default.emit('action', action);
+	  });
+	};
+
+/***/ },
+/* 352 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _socket = __webpack_require__(353);
+
+	var _socket2 = _interopRequireDefault(_socket);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var wsPort = location.hostname === 'localhost' ? ':8470' : '';
+
+	// prod is 'http://react-trivia.herokuapp.com'
+	// local is http://localhost:8470
+	var wsUrl = location.protocol + '//' + location.hostname + wsPort;
+	console.log('Making WebSockets connection to ' + wsUrl);
+	var socket = (0, _socket2.default)(wsUrl);
+
+	window.socket = socket;
+	exports.default = socket;
+
+/***/ },
+/* 353 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -35581,9 +36434,9 @@
 	 * Module dependencies.
 	 */
 
-	var url = __webpack_require__(340);
-	var parser = __webpack_require__(342);
-	var Manager = __webpack_require__(348);
+	var url = __webpack_require__(354);
+	var parser = __webpack_require__(356);
+	var Manager = __webpack_require__(362);
 	var debug = __webpack_require__(20)('socket.io-client');
 
 	/**
@@ -35666,12 +36519,12 @@
 	 * @api public
 	 */
 
-	exports.Manager = __webpack_require__(348);
-	exports.Socket = __webpack_require__(374);
+	exports.Manager = __webpack_require__(362);
+	exports.Socket = __webpack_require__(388);
 
 
 /***/ },
-/* 340 */
+/* 354 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -35679,7 +36532,7 @@
 	 * Module dependencies.
 	 */
 
-	var parseuri = __webpack_require__(341);
+	var parseuri = __webpack_require__(355);
 	var debug = __webpack_require__(20)('socket.io-client:url');
 
 	/**
@@ -35754,7 +36607,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 341 */
+/* 355 */
 /***/ function(module, exports) {
 
 	/**
@@ -35799,7 +36652,7 @@
 
 
 /***/ },
-/* 342 */
+/* 356 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -35808,11 +36661,11 @@
 	 */
 
 	var debug = __webpack_require__(20)('socket.io-parser');
-	var json = __webpack_require__(343);
-	var isArray = __webpack_require__(344);
-	var Emitter = __webpack_require__(345);
-	var binary = __webpack_require__(346);
-	var isBuf = __webpack_require__(347);
+	var json = __webpack_require__(357);
+	var isArray = __webpack_require__(358);
+	var Emitter = __webpack_require__(359);
+	var binary = __webpack_require__(360);
+	var isBuf = __webpack_require__(361);
 
 	/**
 	 * Protocol version.
@@ -36205,7 +37058,7 @@
 
 
 /***/ },
-/* 343 */
+/* 357 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! JSON v3.3.2 | http://bestiejs.github.io/json3 | Copyright 2012-2014, Kit Cambridge | http://kit.mit-license.org */
@@ -37114,7 +37967,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module), (function() { return this; }())))
 
 /***/ },
-/* 344 */
+/* 358 */
 /***/ function(module, exports) {
 
 	module.exports = Array.isArray || function (arr) {
@@ -37123,7 +37976,7 @@
 
 
 /***/ },
-/* 345 */
+/* 359 */
 /***/ function(module, exports) {
 
 	
@@ -37293,7 +38146,7 @@
 
 
 /***/ },
-/* 346 */
+/* 360 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*global Blob,File*/
@@ -37302,8 +38155,8 @@
 	 * Module requirements
 	 */
 
-	var isArray = __webpack_require__(344);
-	var isBuf = __webpack_require__(347);
+	var isArray = __webpack_require__(358);
+	var isBuf = __webpack_require__(361);
 
 	/**
 	 * Replaces every Buffer | ArrayBuffer in packet with a numbered placeholder.
@@ -37441,7 +38294,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 347 */
+/* 361 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -37461,7 +38314,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 348 */
+/* 362 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -37469,15 +38322,15 @@
 	 * Module dependencies.
 	 */
 
-	var eio = __webpack_require__(349);
-	var Socket = __webpack_require__(374);
-	var Emitter = __webpack_require__(375);
-	var parser = __webpack_require__(342);
-	var on = __webpack_require__(377);
-	var bind = __webpack_require__(378);
+	var eio = __webpack_require__(363);
+	var Socket = __webpack_require__(388);
+	var Emitter = __webpack_require__(389);
+	var parser = __webpack_require__(356);
+	var on = __webpack_require__(391);
+	var bind = __webpack_require__(392);
 	var debug = __webpack_require__(20)('socket.io-client:manager');
-	var indexOf = __webpack_require__(372);
-	var Backoff = __webpack_require__(380);
+	var indexOf = __webpack_require__(386);
+	var Backoff = __webpack_require__(394);
 
 	/**
 	 * IE6+ hasOwnProperty
@@ -38024,19 +38877,19 @@
 
 
 /***/ },
-/* 349 */
+/* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	module.exports =  __webpack_require__(350);
+	module.exports =  __webpack_require__(364);
 
 
 /***/ },
-/* 350 */
+/* 364 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	module.exports = __webpack_require__(351);
+	module.exports = __webpack_require__(365);
 
 	/**
 	 * Exports parser
@@ -38044,25 +38897,25 @@
 	 * @api public
 	 *
 	 */
-	module.exports.parser = __webpack_require__(358);
+	module.exports.parser = __webpack_require__(372);
 
 
 /***/ },
-/* 351 */
+/* 365 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var transports = __webpack_require__(352);
-	var Emitter = __webpack_require__(345);
+	var transports = __webpack_require__(366);
+	var Emitter = __webpack_require__(359);
 	var debug = __webpack_require__(20)('engine.io-client:socket');
-	var index = __webpack_require__(372);
-	var parser = __webpack_require__(358);
-	var parseuri = __webpack_require__(341);
-	var parsejson = __webpack_require__(373);
-	var parseqs = __webpack_require__(366);
+	var index = __webpack_require__(386);
+	var parser = __webpack_require__(372);
+	var parseuri = __webpack_require__(355);
+	var parsejson = __webpack_require__(387);
+	var parseqs = __webpack_require__(380);
 
 	/**
 	 * Module exports.
@@ -38186,9 +39039,9 @@
 	 */
 
 	Socket.Socket = Socket;
-	Socket.Transport = __webpack_require__(357);
-	Socket.transports = __webpack_require__(352);
-	Socket.parser = __webpack_require__(358);
+	Socket.Transport = __webpack_require__(371);
+	Socket.transports = __webpack_require__(366);
+	Socket.parser = __webpack_require__(372);
 
 	/**
 	 * Creates transport of the given type.
@@ -38783,17 +39636,17 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 352 */
+/* 366 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies
 	 */
 
-	var XMLHttpRequest = __webpack_require__(353);
-	var XHR = __webpack_require__(355);
-	var JSONP = __webpack_require__(369);
-	var websocket = __webpack_require__(370);
+	var XMLHttpRequest = __webpack_require__(367);
+	var XHR = __webpack_require__(369);
+	var JSONP = __webpack_require__(383);
+	var websocket = __webpack_require__(384);
 
 	/**
 	 * Export transports.
@@ -38843,11 +39696,11 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 353 */
+/* 367 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// browser shim for xmlhttprequest module
-	var hasCORS = __webpack_require__(354);
+	var hasCORS = __webpack_require__(368);
 
 	module.exports = function(opts) {
 	  var xdomain = opts.xdomain;
@@ -38885,7 +39738,7 @@
 
 
 /***/ },
-/* 354 */
+/* 368 */
 /***/ function(module, exports) {
 
 	
@@ -38908,17 +39761,17 @@
 
 
 /***/ },
-/* 355 */
+/* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module requirements.
 	 */
 
-	var XMLHttpRequest = __webpack_require__(353);
-	var Polling = __webpack_require__(356);
-	var Emitter = __webpack_require__(345);
-	var inherit = __webpack_require__(367);
+	var XMLHttpRequest = __webpack_require__(367);
+	var Polling = __webpack_require__(370);
+	var Emitter = __webpack_require__(359);
+	var inherit = __webpack_require__(381);
 	var debug = __webpack_require__(20)('engine.io-client:polling-xhr');
 
 	/**
@@ -39327,18 +40180,18 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 356 */
+/* 370 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var Transport = __webpack_require__(357);
-	var parseqs = __webpack_require__(366);
-	var parser = __webpack_require__(358);
-	var inherit = __webpack_require__(367);
-	var yeast = __webpack_require__(368);
+	var Transport = __webpack_require__(371);
+	var parseqs = __webpack_require__(380);
+	var parser = __webpack_require__(372);
+	var inherit = __webpack_require__(381);
+	var yeast = __webpack_require__(382);
 	var debug = __webpack_require__(20)('engine.io-client:polling');
 
 	/**
@@ -39352,7 +40205,7 @@
 	 */
 
 	var hasXHR2 = (function() {
-	  var XMLHttpRequest = __webpack_require__(353);
+	  var XMLHttpRequest = __webpack_require__(367);
 	  var xhr = new XMLHttpRequest({ xdomain: false });
 	  return null != xhr.responseType;
 	})();
@@ -39580,15 +40433,15 @@
 
 
 /***/ },
-/* 357 */
+/* 371 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var parser = __webpack_require__(358);
-	var Emitter = __webpack_require__(345);
+	var parser = __webpack_require__(372);
+	var Emitter = __webpack_require__(359);
 
 	/**
 	 * Module exports.
@@ -39741,19 +40594,19 @@
 
 
 /***/ },
-/* 358 */
+/* 372 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var keys = __webpack_require__(359);
-	var hasBinary = __webpack_require__(360);
-	var sliceBuffer = __webpack_require__(361);
-	var base64encoder = __webpack_require__(362);
-	var after = __webpack_require__(363);
-	var utf8 = __webpack_require__(364);
+	var keys = __webpack_require__(373);
+	var hasBinary = __webpack_require__(374);
+	var sliceBuffer = __webpack_require__(375);
+	var base64encoder = __webpack_require__(376);
+	var after = __webpack_require__(377);
+	var utf8 = __webpack_require__(378);
 
 	/**
 	 * Check if we are running an android browser. That requires us to use
@@ -39810,7 +40663,7 @@
 	 * Create a blob api even for blob builder when vendor prefixes exist
 	 */
 
-	var Blob = __webpack_require__(365);
+	var Blob = __webpack_require__(379);
 
 	/**
 	 * Encodes a packet.
@@ -40342,7 +41195,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 359 */
+/* 373 */
 /***/ function(module, exports) {
 
 	
@@ -40367,7 +41220,7 @@
 
 
 /***/ },
-/* 360 */
+/* 374 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -40375,7 +41228,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(344);
+	var isArray = __webpack_require__(358);
 
 	/**
 	 * Module exports.
@@ -40432,7 +41285,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 361 */
+/* 375 */
 /***/ function(module, exports) {
 
 	/**
@@ -40467,7 +41320,7 @@
 
 
 /***/ },
-/* 362 */
+/* 376 */
 /***/ function(module, exports) {
 
 	/*
@@ -40532,7 +41385,7 @@
 
 
 /***/ },
-/* 363 */
+/* 377 */
 /***/ function(module, exports) {
 
 	module.exports = after
@@ -40566,7 +41419,7 @@
 
 
 /***/ },
-/* 364 */
+/* 378 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! https://mths.be/utf8js v2.0.0 by @mathias */
@@ -40815,7 +41668,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module), (function() { return this; }())))
 
 /***/ },
-/* 365 */
+/* 379 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -40918,7 +41771,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 366 */
+/* 380 */
 /***/ function(module, exports) {
 
 	/**
@@ -40961,7 +41814,7 @@
 
 
 /***/ },
-/* 367 */
+/* 381 */
 /***/ function(module, exports) {
 
 	
@@ -40973,7 +41826,7 @@
 	};
 
 /***/ },
-/* 368 */
+/* 382 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -41047,7 +41900,7 @@
 
 
 /***/ },
-/* 369 */
+/* 383 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -41055,8 +41908,8 @@
 	 * Module requirements.
 	 */
 
-	var Polling = __webpack_require__(356);
-	var inherit = __webpack_require__(367);
+	var Polling = __webpack_require__(370);
+	var inherit = __webpack_require__(381);
 
 	/**
 	 * Module exports.
@@ -41292,18 +42145,18 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 370 */
+/* 384 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Module dependencies.
 	 */
 
-	var Transport = __webpack_require__(357);
-	var parser = __webpack_require__(358);
-	var parseqs = __webpack_require__(366);
-	var inherit = __webpack_require__(367);
-	var yeast = __webpack_require__(368);
+	var Transport = __webpack_require__(371);
+	var parser = __webpack_require__(372);
+	var parseqs = __webpack_require__(380);
+	var inherit = __webpack_require__(381);
+	var yeast = __webpack_require__(382);
 	var debug = __webpack_require__(20)('engine.io-client:websocket');
 	var BrowserWebSocket = global.WebSocket || global.MozWebSocket;
 
@@ -41316,7 +42169,7 @@
 	var WebSocket = BrowserWebSocket;
 	if (!WebSocket && typeof window === 'undefined') {
 	  try {
-	    WebSocket = __webpack_require__(371);
+	    WebSocket = __webpack_require__(385);
 	  } catch (e) { }
 	}
 
@@ -41587,13 +42440,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 371 */
+/* 385 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 372 */
+/* 386 */
 /***/ function(module, exports) {
 
 	
@@ -41608,7 +42461,7 @@
 	};
 
 /***/ },
-/* 373 */
+/* 387 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -41646,7 +42499,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 374 */
+/* 388 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -41654,13 +42507,13 @@
 	 * Module dependencies.
 	 */
 
-	var parser = __webpack_require__(342);
-	var Emitter = __webpack_require__(375);
-	var toArray = __webpack_require__(376);
-	var on = __webpack_require__(377);
-	var bind = __webpack_require__(378);
+	var parser = __webpack_require__(356);
+	var Emitter = __webpack_require__(389);
+	var toArray = __webpack_require__(390);
+	var on = __webpack_require__(391);
+	var bind = __webpack_require__(392);
 	var debug = __webpack_require__(20)('socket.io-client:socket');
-	var hasBin = __webpack_require__(379);
+	var hasBin = __webpack_require__(393);
 
 	/**
 	 * Module exports.
@@ -42064,7 +42917,7 @@
 
 
 /***/ },
-/* 375 */
+/* 389 */
 /***/ function(module, exports) {
 
 	
@@ -42231,7 +43084,7 @@
 
 
 /***/ },
-/* 376 */
+/* 390 */
 /***/ function(module, exports) {
 
 	module.exports = toArray
@@ -42250,7 +43103,7 @@
 
 
 /***/ },
-/* 377 */
+/* 391 */
 /***/ function(module, exports) {
 
 	
@@ -42280,7 +43133,7 @@
 
 
 /***/ },
-/* 378 */
+/* 392 */
 /***/ function(module, exports) {
 
 	/**
@@ -42309,7 +43162,7 @@
 
 
 /***/ },
-/* 379 */
+/* 393 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -42317,7 +43170,7 @@
 	 * Module requirements.
 	 */
 
-	var isArray = __webpack_require__(344);
+	var isArray = __webpack_require__(358);
 
 	/**
 	 * Module exports.
@@ -42375,7 +43228,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 380 */
+/* 394 */
 /***/ function(module, exports) {
 
 	
@@ -42466,781 +43319,26 @@
 
 
 /***/ },
-/* 381 */
+/* 395 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = getClientId;
+	var _socket = __webpack_require__(352);
 
-	var _uuid = __webpack_require__(382);
+	var _socket2 = _interopRequireDefault(_socket);
 
-	var _uuid2 = _interopRequireDefault(_uuid);
+	var _store = __webpack_require__(321);
+
+	var _store2 = _interopRequireDefault(_store);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var localStorageKey = 'ReactTrivia-clientId';
+	var setStateMethod = 'setState';
 
-	function getClientId() {
-	  var id = localStorage.getItem(localStorageKey);
-	  if (!id) {
-	    id = _uuid2.default.v4();
-	    localStorage.setItem(localStorageKey, id);
-	  }
-	  return id;
-	}
-
-/***/ },
-/* 382 */
-/***/ function(module, exports, __webpack_require__) {
-
-	//     uuid.js
-	//
-	//     Copyright (c) 2010-2012 Robert Kieffer
-	//     MIT License - http://opensource.org/licenses/mit-license.php
-
-	// Unique ID creation requires a high quality random # generator.  We feature
-	// detect to determine the best RNG source, normalizing to a function that
-	// returns 128-bits of randomness, since that's what's usually required
-	var _rng = __webpack_require__(383);
-
-	// Maps for number <-> hex string conversion
-	var _byteToHex = [];
-	var _hexToByte = {};
-	for (var i = 0; i < 256; i++) {
-	  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
-	  _hexToByte[_byteToHex[i]] = i;
-	}
-
-	// **`parse()` - Parse a UUID into it's component bytes**
-	function parse(s, buf, offset) {
-	  var i = (buf && offset) || 0, ii = 0;
-
-	  buf = buf || [];
-	  s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
-	    if (ii < 16) { // Don't overflow!
-	      buf[i + ii++] = _hexToByte[oct];
-	    }
-	  });
-
-	  // Zero out remaining bytes if string was short
-	  while (ii < 16) {
-	    buf[i + ii++] = 0;
-	  }
-
-	  return buf;
-	}
-
-	// **`unparse()` - Convert UUID byte array (ala parse()) into a string**
-	function unparse(buf, offset) {
-	  var i = offset || 0, bth = _byteToHex;
-	  return  bth[buf[i++]] + bth[buf[i++]] +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] + '-' +
-	          bth[buf[i++]] + bth[buf[i++]] +
-	          bth[buf[i++]] + bth[buf[i++]] +
-	          bth[buf[i++]] + bth[buf[i++]];
-	}
-
-	// **`v1()` - Generate time-based UUID**
-	//
-	// Inspired by https://github.com/LiosK/UUID.js
-	// and http://docs.python.org/library/uuid.html
-
-	// random #'s we need to init node and clockseq
-	var _seedBytes = _rng();
-
-	// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-	var _nodeId = [
-	  _seedBytes[0] | 0x01,
-	  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
-	];
-
-	// Per 4.2.2, randomize (14 bit) clockseq
-	var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
-
-	// Previous uuid creation time
-	var _lastMSecs = 0, _lastNSecs = 0;
-
-	// See https://github.com/broofa/node-uuid for API details
-	function v1(options, buf, offset) {
-	  var i = buf && offset || 0;
-	  var b = buf || [];
-
-	  options = options || {};
-
-	  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
-
-	  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-	  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-	  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-	  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-	  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
-
-	  // Per 4.2.1.2, use count of uuid's generated during the current clock
-	  // cycle to simulate higher resolution clock
-	  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
-
-	  // Time since last uuid creation (in msecs)
-	  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
-
-	  // Per 4.2.1.2, Bump clockseq on clock regression
-	  if (dt < 0 && options.clockseq === undefined) {
-	    clockseq = clockseq + 1 & 0x3fff;
-	  }
-
-	  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-	  // time interval
-	  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-	    nsecs = 0;
-	  }
-
-	  // Per 4.2.1.2 Throw error if too many uuids are requested
-	  if (nsecs >= 10000) {
-	    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
-	  }
-
-	  _lastMSecs = msecs;
-	  _lastNSecs = nsecs;
-	  _clockseq = clockseq;
-
-	  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-	  msecs += 12219292800000;
-
-	  // `time_low`
-	  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-	  b[i++] = tl >>> 24 & 0xff;
-	  b[i++] = tl >>> 16 & 0xff;
-	  b[i++] = tl >>> 8 & 0xff;
-	  b[i++] = tl & 0xff;
-
-	  // `time_mid`
-	  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
-	  b[i++] = tmh >>> 8 & 0xff;
-	  b[i++] = tmh & 0xff;
-
-	  // `time_high_and_version`
-	  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-	  b[i++] = tmh >>> 16 & 0xff;
-
-	  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-	  b[i++] = clockseq >>> 8 | 0x80;
-
-	  // `clock_seq_low`
-	  b[i++] = clockseq & 0xff;
-
-	  // `node`
-	  var node = options.node || _nodeId;
-	  for (var n = 0; n < 6; n++) {
-	    b[i + n] = node[n];
-	  }
-
-	  return buf ? buf : unparse(b);
-	}
-
-	// **`v4()` - Generate random UUID**
-
-	// See https://github.com/broofa/node-uuid for API details
-	function v4(options, buf, offset) {
-	  // Deprecated - 'format' argument, as supported in v1.2
-	  var i = buf && offset || 0;
-
-	  if (typeof(options) == 'string') {
-	    buf = options == 'binary' ? new Array(16) : null;
-	    options = null;
-	  }
-	  options = options || {};
-
-	  var rnds = options.random || (options.rng || _rng)();
-
-	  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-	  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-	  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-	  // Copy bytes to buffer, if provided
-	  if (buf) {
-	    for (var ii = 0; ii < 16; ii++) {
-	      buf[i + ii] = rnds[ii];
-	    }
-	  }
-
-	  return buf || unparse(rnds);
-	}
-
-	// Export public API
-	var uuid = v4;
-	uuid.v1 = v1;
-	uuid.v4 = v4;
-	uuid.parse = parse;
-	uuid.unparse = unparse;
-
-	module.exports = uuid;
-
-
-/***/ },
-/* 383 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {
-	var rng;
-
-	if (global.crypto && crypto.getRandomValues) {
-	  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
-	  // Moderately fast, high quality
-	  var _rnds8 = new Uint8Array(16);
-	  rng = function whatwgRNG() {
-	    crypto.getRandomValues(_rnds8);
-	    return _rnds8;
-	  };
-	}
-
-	if (!rng) {
-	  // Math.random()-based (RNG)
-	  //
-	  // If all else fails, use Math.random().  It's fast, but is of unspecified
-	  // quality.
-	  var  _rnds = new Array(16);
-	  rng = function() {
-	    for (var i = 0, r; i < 16; i++) {
-	      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-	      _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-	    }
-
-	    return _rnds;
-	  };
-	}
-
-	module.exports = rng;
-
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 384 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	_socket2.default.on(setStateMethod, function (payload) {
+	  _store2.default.dispatch({ type: setStateMethod, payload: payload });
 	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _pubsub = __webpack_require__(338);
-
-	var _reduxAct = __webpack_require__(324);
-
-	var _game = __webpack_require__(323);
-
-	var Game = _interopRequireWildcard(_game);
-
-	var _player = __webpack_require__(334);
-
-	var Player = _interopRequireWildcard(_player);
-
-	var _round = __webpack_require__(335);
-
-	var Round = _interopRequireWildcard(_round);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	var actions = _extends({}, Game.Actions, Player.Actions, Round.Actions, {
-	  setState: _pubsub.setState
-	});
-
-	exports.default = actions;
-
-/***/ },
-/* 385 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _react = __webpack_require__(75);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _Round = __webpack_require__(386);
-
-	var _Round2 = _interopRequireDefault(_Round);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	__webpack_require__(387);
-
-	exports.default = function (_ref) {
-	  var _ref$game = _ref.game;
-	  var game = _ref$game === undefined ? {} : _ref$game;
-	  var _ref$round = _ref.round;
-	  var round = _ref$round === undefined ? {} : _ref$round;
-	  return _react2.default.createElement(
-	    'div',
-	    null,
-	    _react2.default.createElement(
-	      'a',
-	      { href: '#test' },
-	      'Open Test Harness'
-	    ),
-	    _react2.default.createElement(
-	      'h3',
-	      null,
-	      'Game: ',
-	      game.title,
-	      _react2.default.createElement(
-	        'i',
-	        null,
-	        '(',
-	        game.status,
-	        ')'
-	      ),
-	      _react2.default.createElement(_Round2.default, round)
-	    )
-	  );
-	};
-
-/***/ },
-/* 386 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _react = __webpack_require__(75);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _actions = __webpack_require__(384);
-
-	var _actions2 = _interopRequireDefault(_actions);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = function (_ref) {
-	  var question = _ref.question;
-	  var responses = _ref.responses;
-
-	  var _ref2 = question || {};
-
-	  var id = _ref2.id;
-	  var prompt = _ref2.prompt;
-	  var _ref2$choices = _ref2.choices;
-	  var choices = _ref2$choices === undefined ? [] : _ref2$choices;
-
-
-	  return _react2.default.createElement(
-	    'div',
-	    null,
-	    _react2.default.createElement(
-	      'div',
-	      null,
-	      'Question: ',
-	      prompt
-	    ),
-	    _react2.default.createElement(
-	      'div',
-	      { className: 'voting' },
-	      choices.map(function (choice) {
-	        return _react2.default.createElement(
-	          'button',
-	          {
-	            key: choice,
-	            onClick: function onClick() {
-	              return _actions2.default.answerQuestion({ choice: choice, questionId: id });
-	            }
-	          },
-	          _react2.default.createElement(
-	            'h1',
-	            null,
-	            choice
-	          )
-	        );
-	      })
-	    )
-	  );
-	};
-
-/***/ },
-/* 387 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(388);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(390)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/postcss-loader/index.js!./style.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/postcss-loader/index.js!./style.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 388 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(389)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "body {\n  font-family: 'Open Sans', sans-serif;\n/*  background-color: #673AB7;\n  color: white;\n*/}\n\nbutton[disabled] {\n  opacity: 0.5;\n}\n\n/* Voting Screen */\n\n.voting {\n/*  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n\n  -webkit-user-select: none;\n\n     -moz-user-select: none;\n\n      -ms-user-select: none;\n\n          user-select: none;\n}\n\n.voting button {\n  -webkit-box-flex: 1;\n      -ms-flex: 1 0 0;\n          flex: 1 0 0;\n\n  /*background-color: #673AB7;*/\n  border-width: 0;\n}\n.voting button:first-child {\n  border-bottom: 1px solid white;\n}\n.voting button:active {\n  background-color: white;\n  color: #311B92;\n}\n.voting button.voted {\n  background-color: #311B92;\n}\n.voting button:not(.voted) .label {\n  visibility: hidden;\n}\n.voting button .label {\n  opacity: 0.87;\n}\n.voting button.votedAgainst * {\n  opacity: 0.3;\n}\n\n@media only screen and (min-width: 500px) {\n  .voting {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n        -ms-flex-direction: row;\n            flex-direction: row;\n  }\n  .voting button:first-child {\n    border-bottom-width: 0;\n    border-right: 1px solid white;\n  }\n}\n\n/* Results Screen */\n\n.results {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n\n  display: -webkit-box;\n\n  display: -ms-flexbox;\n\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n}\n.results .tally {\n  -webkit-box-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n\n  display: -webkit-box;\n\n  display: -ms-flexbox;\n\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n}\n.results .tally .entry {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: distribute;\n      justify-content: space-around;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n\n.results .tally h1 {\n  width: 25%;\n}\n.results .tally .voteVisualization {\n  height: 50px;\n  width: 50%;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: start;\n      -ms-flex-pack: start;\n          justify-content: flex-start;\n\n  background-color: #7E57C2;\n}\n.results .tally .votesBlock {\n  background-color: white;\n  -webkit-transition: width 0.5s;\n  transition: width 0.5s;\n}\n.results .tally .voteCount {\n  font-size: 2rem;\n}\n\n.results .management {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n\n  height: 2em;\n  border-top: 1px solid #aaa;\n}\n\n.results .management button {\n  border: 0;\n  background-color: black;\n  color: #aaa;\n}\n.results .management .next {\n  -webkit-box-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n}\n\n/* Winner View */\n\n.winner {\n  font-size: 4rem;\n  text-align: center;\n}\n\n/* Connection State */\n\n.connectionState {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n\n  padding: 5px;\n\n  text-align: center;\n\n  background-color: #B71C1C;\n}\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 389 */
-/***/ function(module, exports) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	module.exports = function() {
-		var list = [];
-
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for(var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if(item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-
-		// import a list of modules into the list
-		list.i = function(modules, mediaQuery) {
-			if(typeof modules === "string")
-				modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for(var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if(typeof id === "number")
-					alreadyImportedModules[id] = true;
-			}
-			for(i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if(mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if(mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
-
-
-/***/ },
-/* 390 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	var stylesInDom = {},
-		memoize = function(fn) {
-			var memo;
-			return function () {
-				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-				return memo;
-			};
-		},
-		isOldIE = memoize(function() {
-			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
-		}),
-		getHeadElement = memoize(function () {
-			return document.head || document.getElementsByTagName("head")[0];
-		}),
-		singletonElement = null,
-		singletonCounter = 0,
-		styleElementsInsertedAtTop = [];
-
-	module.exports = function(list, options) {
-		if(false) {
-			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-		}
-
-		options = options || {};
-		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-		// tags it will allow on a page
-		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-
-		// By default, add <style> tags to the bottom of <head>.
-		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-
-		var styles = listToStyles(list);
-		addStylesToDom(styles, options);
-
-		return function update(newList) {
-			var mayRemove = [];
-			for(var i = 0; i < styles.length; i++) {
-				var item = styles[i];
-				var domStyle = stylesInDom[item.id];
-				domStyle.refs--;
-				mayRemove.push(domStyle);
-			}
-			if(newList) {
-				var newStyles = listToStyles(newList);
-				addStylesToDom(newStyles, options);
-			}
-			for(var i = 0; i < mayRemove.length; i++) {
-				var domStyle = mayRemove[i];
-				if(domStyle.refs === 0) {
-					for(var j = 0; j < domStyle.parts.length; j++)
-						domStyle.parts[j]();
-					delete stylesInDom[domStyle.id];
-				}
-			}
-		};
-	}
-
-	function addStylesToDom(styles, options) {
-		for(var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-			if(domStyle) {
-				domStyle.refs++;
-				for(var j = 0; j < domStyle.parts.length; j++) {
-					domStyle.parts[j](item.parts[j]);
-				}
-				for(; j < item.parts.length; j++) {
-					domStyle.parts.push(addStyle(item.parts[j], options));
-				}
-			} else {
-				var parts = [];
-				for(var j = 0; j < item.parts.length; j++) {
-					parts.push(addStyle(item.parts[j], options));
-				}
-				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-			}
-		}
-	}
-
-	function listToStyles(list) {
-		var styles = [];
-		var newStyles = {};
-		for(var i = 0; i < list.length; i++) {
-			var item = list[i];
-			var id = item[0];
-			var css = item[1];
-			var media = item[2];
-			var sourceMap = item[3];
-			var part = {css: css, media: media, sourceMap: sourceMap};
-			if(!newStyles[id])
-				styles.push(newStyles[id] = {id: id, parts: [part]});
-			else
-				newStyles[id].parts.push(part);
-		}
-		return styles;
-	}
-
-	function insertStyleElement(options, styleElement) {
-		var head = getHeadElement();
-		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
-		if (options.insertAt === "top") {
-			if(!lastStyleElementInsertedAtTop) {
-				head.insertBefore(styleElement, head.firstChild);
-			} else if(lastStyleElementInsertedAtTop.nextSibling) {
-				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
-			} else {
-				head.appendChild(styleElement);
-			}
-			styleElementsInsertedAtTop.push(styleElement);
-		} else if (options.insertAt === "bottom") {
-			head.appendChild(styleElement);
-		} else {
-			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-		}
-	}
-
-	function removeStyleElement(styleElement) {
-		styleElement.parentNode.removeChild(styleElement);
-		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
-		if(idx >= 0) {
-			styleElementsInsertedAtTop.splice(idx, 1);
-		}
-	}
-
-	function createStyleElement(options) {
-		var styleElement = document.createElement("style");
-		styleElement.type = "text/css";
-		insertStyleElement(options, styleElement);
-		return styleElement;
-	}
-
-	function createLinkElement(options) {
-		var linkElement = document.createElement("link");
-		linkElement.rel = "stylesheet";
-		insertStyleElement(options, linkElement);
-		return linkElement;
-	}
-
-	function addStyle(obj, options) {
-		var styleElement, update, remove;
-
-		if (options.singleton) {
-			var styleIndex = singletonCounter++;
-			styleElement = singletonElement || (singletonElement = createStyleElement(options));
-			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-		} else if(obj.sourceMap &&
-			typeof URL === "function" &&
-			typeof URL.createObjectURL === "function" &&
-			typeof URL.revokeObjectURL === "function" &&
-			typeof Blob === "function" &&
-			typeof btoa === "function") {
-			styleElement = createLinkElement(options);
-			update = updateLink.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-				if(styleElement.href)
-					URL.revokeObjectURL(styleElement.href);
-			};
-		} else {
-			styleElement = createStyleElement(options);
-			update = applyToTag.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-			};
-		}
-
-		update(obj);
-
-		return function updateStyle(newObj) {
-			if(newObj) {
-				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
-					return;
-				update(obj = newObj);
-			} else {
-				remove();
-			}
-		};
-	}
-
-	var replaceText = (function () {
-		var textStore = [];
-
-		return function (index, replacement) {
-			textStore[index] = replacement;
-			return textStore.filter(Boolean).join('\n');
-		};
-	})();
-
-	function applyToSingletonTag(styleElement, index, remove, obj) {
-		var css = remove ? "" : obj.css;
-
-		if (styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = replaceText(index, css);
-		} else {
-			var cssNode = document.createTextNode(css);
-			var childNodes = styleElement.childNodes;
-			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-			if (childNodes.length) {
-				styleElement.insertBefore(cssNode, childNodes[index]);
-			} else {
-				styleElement.appendChild(cssNode);
-			}
-		}
-	}
-
-	function applyToTag(styleElement, obj) {
-		var css = obj.css;
-		var media = obj.media;
-
-		if(media) {
-			styleElement.setAttribute("media", media)
-		}
-
-		if(styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = css;
-		} else {
-			while(styleElement.firstChild) {
-				styleElement.removeChild(styleElement.firstChild);
-			}
-			styleElement.appendChild(document.createTextNode(css));
-		}
-	}
-
-	function updateLink(linkElement, obj) {
-		var css = obj.css;
-		var sourceMap = obj.sourceMap;
-
-		if(sourceMap) {
-			// http://stackoverflow.com/a/26603875
-			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-		}
-
-		var blob = new Blob([css], { type: "text/css" });
-
-		var oldSrc = linkElement.href;
-
-		linkElement.href = URL.createObjectURL(blob);
-
-		if(oldSrc)
-			URL.revokeObjectURL(oldSrc);
-	}
-
-
-/***/ },
-/* 391 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _reduxAct = __webpack_require__(324);
-
-	var _actions = __webpack_require__(384);
-
-	var _actions2 = _interopRequireDefault(_actions);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = function (store) {
-	  return (0, _reduxAct.assignAll)(_actions2.default, store);
-	};
 
 /***/ }
 /******/ ]);
