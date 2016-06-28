@@ -6,6 +6,7 @@ import getClientID from './myID'
 
 export default (store) => assignAll(Actions, (action) => {
   //mark for this user
+  action.meta = action.meta || {}
   action.meta.clientID = getClientID()
 
   if (!action.meta.skipClient) store.dispatch(action)

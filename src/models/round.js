@@ -2,23 +2,19 @@ import {createAction, createReducer} from 'redux-act'
 import Question from './question'
 import {skipClient} from '../actionMeta'
 
-export let advanceQuestion = createAction('ADVANCE_QUESTION', ...skipClient)
-export let answerQuestion = createAction('ANSWER_QUESTION', ...skipClient)
+export let answerQuestion = createAction('ANSWER_QUESTION')
 export let judgeQuestion = createAction('JUDGE_QUESTION', ...skipClient)
+export let advanceQuestion = createAction('ADVANCE_QUESTION', ...skipClient)
 
 export let initialRound = {question: null, responses: []}
 
 export let Actions = {
-  advanceQuestion,
   answerQuestion,
-  judgeQuestion
+  judgeQuestion,
+  advanceQuestion
 }
 
 export let Reducer = createReducer({
-  [advanceQuestion]: (round, _) => ({
-    question: Question.nextQuestion(round.question),
-    responses: []
-  }),
   [answerQuestion]: (round, answer, meta) => {
     let response = {...answer, clientID: meta.clientID}
     return {
@@ -32,5 +28,9 @@ export let Reducer = createReducer({
       responses: round.responses,
       judged: true
     }
-  }
+  },
+  [advanceQuestion]: (round, _) => ({
+    question: Question.nextQuestion(round.question),
+    responses: []
+  })
 }, initialRound)
