@@ -1,8 +1,17 @@
 import socket from './socket'
 import store from './store'
 
-const setStateMethod = 'setState'
+// any actions we recieve with this name will have their payloads
+// dispatched to the store as Flux Standard Actions
+const clientMethods = [
+  'setState'
+]
 
-socket.on(setStateMethod, (payload) => {
-  store.dispatch({type: setStateMethod, payload})
-})
+clientMethods.forEach(methodName =>
+  socket.on(methodName, payload => {
+    store.dispatch({
+      type: methodName,
+      payload
+    })
+  })
+)

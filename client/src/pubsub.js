@@ -1,5 +1,4 @@
-import bindActions from './bindActions'
+import dispatchActions from './dispatchActions'
 import stateSubscriber from './stateSubscriber'
 
-bindActions(store)
 
