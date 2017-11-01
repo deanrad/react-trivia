@@ -12,7 +12,7 @@
     "client": "webpack-dev-server --host 0.0.0.0 --port 3120",
     "test": "echo 'Test soon'",
     "test:watch": "npm run test -- --watch",
-    "deploy": "webpack && git add client/ && git commit -m 'rebundle' && git push heroku master",
+    "deploy": "webpack && git add client/ && git commit -m 'rebundle' && git push origin master",
     "repl": "node -r reify/repl --use_strict"
   },
   "author": "",
