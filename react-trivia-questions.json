@@ -50,5 +50,68 @@
       "Mongoose"
     ],
     "answer": "Express"
+  },
+  {
+    "id": 6,
+    "prompt": "A package.json gains a dependency via:",
+    "choices": [
+      "npm init -y",
+      "npm install express",
+      "npm install -S express",
+      "npm blame"
+    ],
+    "answer": "npm install -S express"
+  },
+  {
+    "id": 7,
+    "prompt": "Which of these REST actions is *mismatched* to its CRUD verb?",
+    "choices": [
+      "CREATE - INSERT",
+      "GET - SELECT",
+      "PATCH - UPDATE",
+      "DESTROY - DELETE"
+    ],
+    "answer": "CREATE - INSERT"
+  },
+  {
+    "id": 8,
+    "prompt": "All of these are reasons to render HTML on the server with Handlebars EXCEPT",
+    "choices": [
+      "Search Engines (Google)",
+      "Requires higher-powered device to render the page",
+      "Faster initial load of content",
+      "Requires lower-powered device to render the page"
+    ],
+    "answer": "Requires higher-powered device to render the page"
+  },
+  {
+    "id": 9,
+    "prompt": "Handlebars triple-mustache will allow HTML from your database into the page as-is.",
+    "choices": [
+      "Yay! Just what I need!",
+      "Yay! (Better look out for malicious user content)",
+      "False"
+    ],
+    "answer": "Yay! (Better look out for malicious user content)"
+  },
+  {
+    "id": 10,
+    "prompt": "Heroku will configure your app's database string via:",
+    "choices": [
+      "process.argv[2]",
+      "process.env.PORT",
+      "process.argv.JAWSDB_URL",
+      "process.env.JAWSDB_URL"
+    ],
+    "answer": "process.env.JAWSDB_URL"
+  },
+  {
+    "id": 11,
+    "prompt": "Whether you think you can, or you can't - you're correct.",
+    "choices": [
+      "True",
+      "False"
+    ],
+    "answer": "True"
   }
 ]
