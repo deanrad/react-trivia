@@ -1,8 +1,9 @@
 body {
   font-family: 'Open Sans', sans-serif;
-/*  background-color: #673AB7;
+  /*  background-color: #673AB7;
   color: white;
-*/}
+*/
+}
 
 button[disabled] {
   opacity: 0.5;
@@ -23,7 +24,7 @@ button.incorrect {
 /* Voting Screen */
 
 .voting {
-/*  position: fixed;
+  /*  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -37,19 +38,14 @@ button.incorrect {
 
 .voting button {
   flex: 1 0 0;
-
-  /*background-color: #673AB7;*/
-  /*border-width: 0;*/
-}
-.voting button:first-child {
-  border-bottom: 1px solid white;
+  background-color: #eee;
 }
 .voting button:active {
   background-color: white;
-  color: #311B92;
+  color: #311b92;
 }
 .voting button.voted {
-  background-color: #311B92;
+  background-color: #311b92;
 }
 .voting button:not(.voted) .label {
   visibility: hidden;
@@ -105,7 +101,7 @@ button.incorrect {
   display: flex;
   justify-content: flex-start;
 
-  background-color: #7E57C2;
+  background-color: #7e57c2;
 }
 .results .tally .votesBlock {
   background-color: white;
@@ -150,5 +146,5 @@ button.incorrect {
 
   text-align: center;
 
-  background-color: #B71C1C;
+  background-color: #b71c1c;
 }
