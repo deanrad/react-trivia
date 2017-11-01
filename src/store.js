@@ -1,6 +1,6 @@
-import {createStore, applyMiddleware} from 'redux'
-import reducer from './reducer'
-import * as serverMiddleware from './serverMiddleware'
+import { createStore, applyMiddleware } from "redux"
+import reducer from "./reducer"
+import * as serverMiddleware from "./serverMiddleware"
 
 let middlewareStoreCreator = applyMiddleware(
   ...Object.values(serverMiddleware)

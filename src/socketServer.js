@@ -1,5 +1,5 @@
-import httpServer from './httpServer'
-import Server from 'socket.io'
+import httpServer from "./httpServer"
+import Server from "socket.io"
 
 const socketServer = new Server(httpServer)
 

@@ -1,6 +1,6 @@
-import uuid from 'uuid'
+import uuid from "uuid"
 
-const localStorageKey = 'ReactTrivia-clientId'
+const localStorageKey = "ReactTrivia-clientId"
 
 export default function getClientId() {
   let id = localStorage.getItem(localStorageKey)
