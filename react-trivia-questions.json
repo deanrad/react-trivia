@@ -8,7 +8,13 @@
       "Whiskey",
       "Moonshine"
     ],
-    "answer": "Moonshine"
+    "answer": "Moonshine",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 2,
@@ -19,7 +25,13 @@
       "10 weeks",
       "10 months"
     ],
-    "answer": "10 days"
+    "answer": "10 days",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 3,
@@ -29,7 +41,13 @@
       "/api/table/id/1",
       "/api/table/2"
     ],
-    "answer": "/api/table/id/1"
+    "answer": "/api/table/id/1",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 4,
@@ -38,7 +56,13 @@
       "true",
       "false"
     ],
-    "answer": "true"
+    "answer": "true",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 5,
@@ -49,7 +73,13 @@
       "A custom library taking callbacks",
       "Mongoose"
     ],
-    "answer": "Express"
+    "answer": "Express",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 6,
@@ -60,7 +90,13 @@
       "npm install -S express",
       "npm blame"
     ],
-    "answer": "npm install -S express"
+    "answer": "npm install -S express",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 7,
@@ -71,7 +107,13 @@
       "PATCH - UPDATE",
       "DESTROY - DELETE"
     ],
-    "answer": "CREATE - INSERT"
+    "answer": "CREATE - INSERT",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 8,
@@ -82,7 +124,13 @@
       "Faster initial load of content",
       "Requires lower-powered device to render the page"
     ],
-    "answer": "Requires higher-powered device to render the page"
+    "answer": "Requires higher-powered device to render the page",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 9,
@@ -92,7 +140,13 @@
       "Yay! (Better look out for malicious user content)",
       "False"
     ],
-    "answer": "Yay! (Better look out for malicious user content)"
+    "answer": "Yay! (Better look out for malicious user content)",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   },
   {
     "id": 10,
@@ -103,15 +157,12 @@
       "process.argv.JAWSDB_URL",
       "process.env.JAWSDB_URL"
     ],
-    "answer": "process.env.JAWSDB_URL"
-  },
-  {
-    "id": 11,
-    "prompt": "Whether you think you can, or you can't - you're correct?",
-    "choices": [
-      "True",
-      "False"
-    ],
-    "answer": "True"
+    "answer": "process.env.JAWSDB_URL",
+    "links": [
+      {
+        "href": "www.google.com",
+        "text": "LMGTFY"
+      }
+    ]
   }
 ]
