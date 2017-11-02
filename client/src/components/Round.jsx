@@ -11,7 +11,7 @@ export default ({ question, responses, judged }) => {
   return (
     <div>
       <div>Question: {prompt}</div>
-
+      <br/>
       <div className="voting">
         {choices.map(choice =>
           VoteButton({ myID, choice, question, responses, judged })
