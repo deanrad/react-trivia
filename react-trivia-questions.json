@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "prompt": "Mountain Dew was originally slang for:",
+    "prompt": "Mountain Dew was originally slang for?",
     "choices": [
       "Coffee",
       "Red Bull",
@@ -12,7 +12,7 @@
   },
   {
     "id": 2,
-    "prompt": "JavaScript's creator spent this long creating it:",
+    "prompt": "JavaScript's creator spent this long creating it?",
     "choices": [
       "10 hours",
       "10 days",
@@ -23,7 +23,7 @@
   },
   {
     "id": 3,
-    "prompt": "The Express route /api/:table/:id? does NOT match:",
+    "prompt": "The Express route /api/:table/:id? does NOT match?",
     "choices": [
       "/api/users/",
       "/api/table/id/1",
@@ -33,7 +33,7 @@
   },
   {
     "id": 4,
-    "prompt": "In a database with Parent/Child records, the record with the primary key is pointed to by the record with the foreign key.",
+    "prompt": "In a database with Parent/Child records, the record with the primary key is pointed to by the record with the foreign key?",
     "choices": [
       "true",
       "false"
@@ -42,7 +42,7 @@
   },
   {
     "id": 5,
-    "prompt": "All of these are examples of ORMs except:",
+    "prompt": "All of these are examples of ORMs except?",
     "choices": [
       "Express",
       "Sequelize",
@@ -53,7 +53,7 @@
   },
   {
     "id": 6,
-    "prompt": "A package.json gains a dependency via:",
+    "prompt": "A package.json gains a dependency via?",
     "choices": [
       "npm init -y",
       "npm install express",
@@ -75,7 +75,7 @@
   },
   {
     "id": 8,
-    "prompt": "All of these are reasons to render HTML on the server with Handlebars EXCEPT",
+    "prompt": "All of these are reasons to render HTML on the server with Handlebars EXCEPT?",
     "choices": [
       "Search Engines (Google)",
       "Requires higher-powered device to render the page",
@@ -86,7 +86,7 @@
   },
   {
     "id": 9,
-    "prompt": "Handlebars triple-mustache will allow HTML from your database into the page as-is.",
+    "prompt": "Handlebars triple-mustache will allow HTML from your database into the page as-is?",
     "choices": [
       "Yay! Just what I need!",
       "Yay! (Better look out for malicious user content)",
@@ -96,7 +96,7 @@
   },
   {
     "id": 10,
-    "prompt": "Heroku will configure your app's database string via:",
+    "prompt": "Heroku will configure your app's database string via?",
     "choices": [
       "process.argv[2]",
       "process.env.PORT",
@@ -107,7 +107,7 @@
   },
   {
     "id": 11,
-    "prompt": "Whether you think you can, or you can't - you're correct.",
+    "prompt": "Whether you think you can, or you can't - you're correct?",
     "choices": [
       "True",
       "False"

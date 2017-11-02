@@ -21,6 +21,24 @@ button.incorrect {
   border: red solid 3px;
 }
 
+#game_title{
+
+  text-align: center;
+  font-size: 32px;
+}
+
+#game_round{
+
+  text-align: center;
+  font-size: 25px;
+}
+
+#game_status{
+
+ 
+
+}
+
 /* Voting Screen */
 
 .voting {
